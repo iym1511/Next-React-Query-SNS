@@ -18,7 +18,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <div></div>
+      루트 레이아웃
       <body className={inter.className}>{children}</body>
     </html>
   );
