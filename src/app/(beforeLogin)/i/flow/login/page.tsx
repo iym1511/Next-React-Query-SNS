@@ -1,9 +1,9 @@
-import { redirect } from "next/navigation";
-
-const Login = () => {
-  <div>
-    로그인페이지
-  </div>
-};
-
-export default Login;
+const Home = () => {
+  return ( 
+    <main>
+      로그인 모달
+    </main>
+   );
+}
+ 
+export default Home;
