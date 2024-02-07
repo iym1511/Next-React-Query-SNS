@@ -68,7 +68,7 @@
   font-size: 17px;
   margin-top: 16px;
   padding: 12px 8px 8px;
-  outline: none;
+  outline: none; /* input 포커스 시 외곽선 제거 */
 }
 
 .modalFooter {
@@ -88,7 +88,7 @@
 .actionButton:disabled {
   opacity: 0.5;
 }
-.actionButton:hover {
+.actionButton:disabled:hover {
   background-color: rgb(39,44,48);
 }
 
