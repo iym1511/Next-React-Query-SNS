@@ -1,8 +1,7 @@
-
 const Home = () => {
   return ( 
     <main>
-      검색 페이지
+      검색페이지
     </main>
    );
 }
