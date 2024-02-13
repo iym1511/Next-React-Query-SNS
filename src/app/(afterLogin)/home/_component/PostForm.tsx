@@ -20,6 +20,7 @@ export default function PostForm() {
   }
 
   const onClickButton = () => {
+    // null 값일 수 있기 떄문에 옵셔널채이닝으로 작성
     imageRef.current?.click();
   }
 

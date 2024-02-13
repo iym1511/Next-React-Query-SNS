@@ -65,6 +65,7 @@
   background-color: rgb(29, 155, 240, 0.1);
 }
 .uploadButton svg {
+  /* svg 색 변경은 fill */
   fill: rgb(29, 155, 240);
 }
 .actionButton:disabled {
