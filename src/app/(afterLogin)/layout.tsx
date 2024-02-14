@@ -8,10 +8,10 @@ import LogoutButton from "./_component/LogoutButton";
 import TrendSection from "./_component/TrendSection";
 import FollowRecommend from "./_component/FollowRecommend";
 
-type Prop = { children: ReactNode; modal: ReactNode };
+type Props = { children: ReactNode; modal: ReactNode };
 
 // home의 레이아웃
-export default async function AfterLoginLayout({ children }: Prop) {
+export default async function AfterLoginLayout({ children, modal }: Props) {
   return (
     <div className={style.container}>
       <header className={style.leftSectionWrapper}>
@@ -36,7 +36,9 @@ export default async function AfterLoginLayout({ children }: Prop) {
       </header>
       <div className={style.rightSectionWrapper}>
         <div className={style.rightSectionInner}>
-          <main className={style.main}>{children}</main>
+          <main className={style.main}>
+            {children}
+          </main>
           <section className={style.rightSection}>
             <div style={{marginBottom:"60px", width:'inherit'}}>
               <form className={style.search}>
@@ -58,6 +60,7 @@ export default async function AfterLoginLayout({ children }: Prop) {
           </section>
         </div>
       </div>
+      {modal}
     </div>
   );
 }

@@ -1,9 +1,9 @@
-const Tweet = () => {
+import Home from "@/app/(afterLogin)/home/page";
+
+const Page = () => {
   return ( 
-    <div>
-      
-    </div>
+    <Home/>
    );
 }
  
-export default Tweet;
+export default Page;
