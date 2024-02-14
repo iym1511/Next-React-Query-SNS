@@ -1,6 +1,10 @@
 import style from './rightSearchZone.module.css'
 
-const SearchForm = () => {
+// q가 필요없는곳도 있어서 옵셔널 해준다.
+type Props = { q? : string}
+
+const SearchForm = ({q} : Props) => {
+  console.log(q)
   return (
     <form className={style.search}>
       <svg width={20} viewBox="0 0 24 24" aria-hidden="true">

@@ -21,6 +21,7 @@ export default function Post() {
     createdAt: new Date(),
     Images: [],
   }
+  
   return (
     <article className={style.post}>
       <div className={style.postWrapper}>
