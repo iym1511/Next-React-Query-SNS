@@ -15,6 +15,8 @@ export default function Default() {
     }
   }
 
+  // 컴포넌트에 Prop해줄때 그냥 변수만 넘기면 boolean형태로 사용가능하다
+  // ex) white == white = {true} 
   return (
     <div className={style.container}>
       <PhotoModalCloseButton />
