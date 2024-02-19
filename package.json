@@ -9,6 +9,8 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@faker-js/faker": "^8.4.1",
+    "@fakerjs/faker": "^3.0.0",
     "classnames": "^2.5.1",
     "cx": "^24.0.3",
     "dayjs": "^1.11.10",
