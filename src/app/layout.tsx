@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css"; // 공통으로 쓰는 css
 import styles from "@/app/page.module.css"; // 개별로 쓰는 css
+import MSWComponent from "./_component/MSWComponent";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -19,7 +20,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
+      <body className={inter.className}>
+        <MSWComponent />
+        {children}
+      </body>
     </html>
   );
 }
