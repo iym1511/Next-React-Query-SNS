@@ -14,4 +14,4 @@ const MSWComponent = () => {
   return null
 };
 
-export default MSWComponent;
+export default MSWComponent; 
