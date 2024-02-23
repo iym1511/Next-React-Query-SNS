@@ -33,7 +33,6 @@ export default function SignupModal() {
   const { pending } = useFormStatus();
   console.log(pending)
   console.log(state?.message)
-
   return (
     <>
       <div className={style.modalBackground}>

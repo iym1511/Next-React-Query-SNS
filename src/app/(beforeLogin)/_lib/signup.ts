@@ -31,6 +31,7 @@ export default async (prevState: any,formData: FormData) => {
     if (response.status === 403) {
       return { message: "user_exists" };
     }
+    console.log(await response.json())
     shouldRedirect = true;
   } catch (err) {
     console.error(err);
