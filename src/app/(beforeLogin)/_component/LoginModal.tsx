@@ -1,20 +1,51 @@
 "use client" // 서버 컴포넌트는 useState같은걸 못쓰기때문에 클라이언트 컴포넌트로 변경
 
+import { useRouter } from 'next/navigation';
 import style from './login.module.css';
-import { useState } from 'react';
+import { ChangeEvent, ChangeEventHandler, FormEventHandler, useState } from 'react';
+import { signIn } from 'next-auth/react';
 
 
 const LoginModal = () => {
-  const [id, setId] = useState();
-  const [password, setPassword] = useState();
-  const [message, setMessage] = useState();
 
-  const onSubmit = () => {};
-  const onClickClose = () => {};
+  const router = useRouter();
 
-  const onChangeId = () => {};
+  const [id, setId] = useState('');
+  const [password, setPassword] = useState('');
+  const [message, setMessage] = useState('');
 
-  const onChangePassword = () => {};
+  const onSubmit:FormEventHandler<HTMLFormElement> = async (e) => {
+    e.preventDefault();
+    setMessage('');
+    // 아이디 비밀번호 호출하기
+    // 그 외에서 'kakao','google' 을 작성하여 호출 가능
+    try{
+      await signIn("credentials", {
+        username: id,
+        password,
+        // redirect를 True로 해주면 서버쪽에서 리다이렉트를 하기때문에
+        // 우리는 클라이언트에서 사용하기때문에 꺼준다.
+        redirect: false,
+      });
+      // 그리고 라우터를 사용
+      router.replace('/home');
+    }catch(err){
+      console.error(err)
+      setMessage("아이디와 비밀번호가 일치하지 않습니다.")
+    }
+  };
+  
+  const onClickClose = () => {
+    router.back(); 
+  };
+
+  const onChangeId:ChangeEventHandler<HTMLInputElement> = (e) => {
+    setId(e.target.value);
+  };
+
+  const onChangePassword:ChangeEventHandler<HTMLInputElement> = (e) => {
+    setPassword(e.target.value);
+  };
 
   return (
     <div className={style.modalBackground}>

@@ -19,7 +19,7 @@
     "cx": "^24.0.3",
     "dayjs": "^1.11.10",
     "next": "14.1.0",
-    "next-auth": "^4.24.6",
+    "next-auth": "^5.0.0-beta.5",
     "react": "^18",
     "react-dom": "^18"
   },
@@ -31,7 +31,7 @@
     "@types/react-dom": "^18",
     "eslint": "^8",
     "eslint-config-next": "14.1.0",
-    "msw": "^2.2.1",
+    "msw": "2.1",
     "typescript": "^5"
   },
   "msw": {
