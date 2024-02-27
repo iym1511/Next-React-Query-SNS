@@ -27,7 +27,6 @@ const LoginModal = () => {
         // 우리는 클라이언트에서 사용하기때문에 꺼준다.
         redirect: false,
       });
-      // 그리고 라우터를 사용
       router.replace('/home');
     }catch(err){
       console.error(err)

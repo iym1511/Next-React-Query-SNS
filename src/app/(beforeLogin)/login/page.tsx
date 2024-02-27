@@ -2,11 +2,19 @@
 
 import { useRouter } from "next/navigation";
 import Main from "../_component/Main";
+import { useSession } from "next-auth/react";
 
 // 리다이렉트 되는곳
 const Login = () => {
+  const { data : session } = useSession();
   const router = useRouter();
+
+  if(session?.user){
+    router.replace('/home');
+    return null;
+  }
   router.replace("/i/flow/login");
+  
   return (
     <>
       <Main />

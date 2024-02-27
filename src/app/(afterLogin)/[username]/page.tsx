@@ -1,12 +1,21 @@
 import style from './profile.module.css';
 import Post from "@/app/(afterLogin)/_component/Post";
 import BackButton from "@/app/(afterLogin)/_component/BackButton";
-export default function Profile() {
+import { auth } from '@/auth';
+import { redirect, useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
+import Link from 'next/link';
+
+export default async function Profile() {
+
+  const session = await auth();
+
   const user = {
     id: 'zerohch0',
     nickname: '제로초',
     image: '/5Udwvqim.jpg'
   };
+
 
   return (
     <main className={style.main}>
@@ -22,7 +31,12 @@ export default function Profile() {
           <div>{user.nickname}</div>
           <div>@{user.id}</div>
         </div>
-        <button className={style.followButton}>팔로우</button>
+        { session?.user ? (
+          <button className={style.followButton}>팔로우</button>
+        ):(
+          <Link className={style.followButton} href={session?.user ? '' : '/i/flow/login'}>팔로우</Link>
+        )
+        }
       </div>
       <div>
         <Post />
