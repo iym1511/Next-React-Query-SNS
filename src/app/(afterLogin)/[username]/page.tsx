@@ -1,3 +1,4 @@
+
 import style from './profile.module.css';
 import Post from "@/app/(afterLogin)/_component/Post";
 import BackButton from "@/app/(afterLogin)/_component/BackButton";
@@ -34,7 +35,7 @@ export default async function Profile() {
         { session?.user ? (
           <button className={style.followButton}>팔로우</button>
         ):(
-          <Link className={style.followButton} href={session?.user ? '' : '/i/flow/login'}>팔로우</Link>
+          <Link className={style.followButton} href='/i/flow/login'>팔로우</Link>
         )
         }
       </div>
