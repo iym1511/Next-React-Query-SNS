@@ -40,12 +40,13 @@ export default async function Profile() {
         }
       </div>
       <div>
+        ㅁㄴㅇ
+        {/* <Post />
         <Post />
         <Post />
         <Post />
         <Post />
-        <Post />
-        <Post />
+        <Post /> */}
       </div>
     </main>
   )

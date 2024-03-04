@@ -6,6 +6,7 @@ import "dayjs/locale/ko";
 import ActionButtons from "./ActionButtons";
 import PostArticle from "./PostArticle";
 import { faker } from "@faker-js/faker";
+import { Post as IPost } from "@/model/Post";
 import PostImages from "./PostImages";
 
 // 한글 플러그인
@@ -14,22 +15,13 @@ dayjs.extend(relativeTime);
 
 type Props = {
   noImage?: boolean;
+  post : IPost
 };
 
+export default function Post({ noImage, post}: Props) {
+  const target = post;
+  // console.log(target.User.id)
 
-
-export default function Post({ noImage }: Props) {
-  const target = {
-    postId: 1,
-    User: {
-      id: "elonmusk",
-      nickname: "Elon Musk",
-      image: "/yRsRRjGO.jpg",
-    },
-    content: "클론코딩 라이브로 하니 너무 힘들어요 ㅠㅠ",
-    createdAt: new Date(),
-    Images: [] as any[],
-  };
 
   // 50%확률로 랜덤이미지 추가
   if (Math.random() > 0.5 && !noImage) {
