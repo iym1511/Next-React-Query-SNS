@@ -2,7 +2,6 @@
 
 import { ReactNode, createContext, useState } from "react";
 
-
 export const TabContext = createContext({
   tab: 'rec',
   setTab: (value: 'rec' | 'fol')=> {},

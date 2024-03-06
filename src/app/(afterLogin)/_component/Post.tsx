@@ -25,10 +25,12 @@ export default function Post({ noImage, post}: Props) {
 
   // 50%확률로 랜덤이미지 추가
   if (Math.random() > 0.5 && !noImage) {
-    target.Images.push({ imageId: 1, link: faker.image.urlLoremFlickr() });
-    target.Images.push({ imageId: 2, link: faker.image.urlLoremFlickr() });
-    target.Images.push({ imageId: 3, link: faker.image.urlLoremFlickr() });
-    target.Images.push({ imageId: 4, link: faker.image.urlLoremFlickr() });
+    target?.Images.push(
+      { imageId: 1, link: faker.image.urlLoremFlickr() },
+      { imageId: 2, link: faker.image.urlLoremFlickr() },
+      { imageId: 3, link: faker.image.urlLoremFlickr() },
+      { imageId: 4, link: faker.image.urlLoremFlickr() }
+    );
   }
 
   return (
