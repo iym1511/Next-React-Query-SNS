@@ -182,6 +182,7 @@ export const handlers = [
       ]
     )
   }),
+  // 특정 유저의 게시글 & 내 게시글
   http.get('/api/users/:userId/posts', ({ request, params }) => {
     const { userId } = params;
     return HttpResponse.json(
@@ -224,6 +225,7 @@ export const handlers = [
       ]
     )
   }),
+  // 특정 사용자
   http.get('/api/users/:userId', ({ request, params }): StrictResponse<any> => {
     const {userId} = params;
     const found = User.find((v) => v.id === userId);
@@ -299,9 +301,11 @@ export const handlers = [
       ]
     )
   }),
+  // 팔로우 추천 대상
   http.get('/api/followRecommends', ({ request}) => {
     return HttpResponse.json(User);
   }),
+  // 최근 트렌드 (해시태그의 검색결과)
   http.get('/api/trends', ({ request }) => {
     return HttpResponse.json(
       [

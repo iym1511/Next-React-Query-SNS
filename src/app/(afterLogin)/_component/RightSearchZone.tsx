@@ -2,6 +2,7 @@
 import style from "@/app/(afterLogin)/_component/rightSearchZone.module.css";
 import { usePathname } from "next/navigation";
 import SearchForm from "./SearchForm";
+import { EventHandler, FocusEventHandler } from "react";
 
 const RightSearchZone = () => {
   const pathname = usePathname();
@@ -9,7 +10,9 @@ const RightSearchZone = () => {
   const onChangeAll = (e:any) => {
     console.log(e.target.checked)
   };
-  const onChangeFollow = () => {};
+  const onChangeFollow = (e:any) => {
+    e.target.checked
+  };
 
   if (pathname === "/explore") {
     return null;
@@ -46,7 +49,7 @@ const RightSearchZone = () => {
               <div>어디에서나</div>
               <input
                 type="radio"
-                name="pf"
+                name="pf2"
                 defaultChecked
                 onChange={onChangeAll}
               />
@@ -55,7 +58,7 @@ const RightSearchZone = () => {
               <div>현 위치 주변</div>
               <input
                 type="radio"
-                name="pf"
+                name="pf2"
                 value="on"
                 onChange={onChangeFollow}
               />

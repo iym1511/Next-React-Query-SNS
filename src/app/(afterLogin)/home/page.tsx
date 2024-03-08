@@ -14,6 +14,7 @@ import TabDecider from "./_component/TabDecider";
 
 
 const Home = async () => {
+
   const queryClient = new QueryClient();
   await queryClient.prefetchQuery({
     queryKey: ["posts", "recommends"],

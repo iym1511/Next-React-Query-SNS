@@ -10,6 +10,7 @@ type Props = {
 };
 
 const Search = ({ searchParams }: Props) => {
+  console.log(searchParams.q)
   return (
     <main className={style.main}>
       <div className={style.searchTop}>

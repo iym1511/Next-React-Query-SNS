@@ -20,17 +20,16 @@ type Props = {
 
 export default function Post({ noImage, post}: Props) {
   const target = post;
-  // console.log(target.User.id)
 
 
   // 50%확률로 랜덤이미지 추가
   if (Math.random() > 0.5 && !noImage) {
-    target?.Images.push(
+    target.Images.push(
       { imageId: 1, link: faker.image.urlLoremFlickr() },
       { imageId: 2, link: faker.image.urlLoremFlickr() },
       { imageId: 3, link: faker.image.urlLoremFlickr() },
       { imageId: 4, link: faker.image.urlLoremFlickr() }
-    );
+    );  
   }
 
   return (
