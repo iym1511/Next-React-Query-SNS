@@ -229,11 +229,14 @@ export const handlers = [
   http.get('/api/users/:userId', ({ request, params }): StrictResponse<any> => {
     const {userId} = params;
     const found = User.find((v) => v.id === userId);
+
+    // 유저 찾으면
     if (found) {
       return HttpResponse.json(
         found,
       );
     }
+    // 에러
     return HttpResponse.json({ message: 'no_such_user' }, {
       status: 404,
     })

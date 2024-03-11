@@ -2,7 +2,6 @@
 import style from "@/app/(afterLogin)/_component/rightSearchZone.module.css";
 import { usePathname } from "next/navigation";
 import SearchForm from "./SearchForm";
-import { EventHandler, FocusEventHandler } from "react";
 
 const RightSearchZone = () => {
   const pathname = usePathname();

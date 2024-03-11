@@ -12,10 +12,11 @@ export default function SinglePost() {
         <h3 className={style.headerTitle}>게시하기</h3>
       </div>
       {/* 원본 게시글 */}
-      <Post />
+      {/* <Post /> */}
       <CommentForm />
       <div>
         {/* 원본게시글의 답글 */}
+        {/* <Post />
         <Post />
         <Post />
         <Post />
@@ -23,8 +24,7 @@ export default function SinglePost() {
         <Post />
         <Post />
         <Post />
-        <Post />
-        <Post />
+        <Post /> */}
       </div>
     </div>
   )

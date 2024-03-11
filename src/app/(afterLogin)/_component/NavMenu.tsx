@@ -3,7 +3,6 @@
 import Link from "next/link";
 import {
   useSelectedLayoutSegment,
-  useSelectedLayoutSegments,
 } from "next/navigation";
 
 import style from './navMenu.module.css'
