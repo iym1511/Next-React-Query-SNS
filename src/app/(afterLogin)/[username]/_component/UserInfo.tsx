@@ -10,6 +10,7 @@ type Props = {
   username: string;
 }
 export default function UserInfo({username}: Props) {
+  
   const {data: user, error} = useQuery<User, Object, User, [_1: string, _2: string]>({
     queryKey: ['users', username],
     queryFn: getUser,
@@ -18,6 +19,7 @@ export default function UserInfo({username}: Props) {
   });
   console.log('error');
   console.dir(error);
+
   if (error) {
     return (
       <>

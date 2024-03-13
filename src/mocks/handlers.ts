@@ -243,6 +243,7 @@ export const handlers = [
   }),
   http.get('/api/posts/:postId', ({ request, params }): StrictResponse<any> => {
     const {postId} = params;
+    // 에러나는 경우
     if (parseInt(postId as string) > 10) {
       return HttpResponse.json({ message: 'no_such_post' }, {
         status: 404,
