@@ -15,17 +15,13 @@ type Props = {
 
 export default async function Page({ params }: Props) {
 
-  const { id } = params;
+  const {id} = params;
   const queryClient = new QueryClient();
-  await queryClient.prefetchQuery({
-    queryKey: ["posts",id],
-    queryFn: getSinglePost,
-  });
-  await queryClient.prefetchQuery({
-    queryKey: ["posts",id,'comments'],
-    queryFn: getComments,
-  });
-  const dehydratedState = dehydrate(queryClient);
+  await queryClient.prefetchQuery({queryKey: ['posts', id], queryFn: getSinglePost})
+  await queryClient.prefetchQuery({queryKey: ['posts', id, 'comments'], queryFn: getComments})
+  const dehydratedState = dehydrate(queryClient)
+
+
   return (
     <div className={style.main}>
       <HydrationBoundary state={dehydratedState}>
@@ -35,7 +31,7 @@ export default async function Page({ params }: Props) {
       </div>
       {/* 개인페이지 게시글 */}
       <SinglePost id={id}/>
-      <CommentForm />
+      <CommentForm id={id}/>
       <div>
       {/* 댓글 */}
       <Comments id={id}/>

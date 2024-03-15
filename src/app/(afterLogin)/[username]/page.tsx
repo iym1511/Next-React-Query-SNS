@@ -1,3 +1,4 @@
+
 import style from './profile.module.css';
 import {dehydrate, HydrationBoundary, QueryClient} from "@tanstack/react-query";
 import UserPosts from "@/app/(afterLogin)/[username]/_component/UserPosts";
