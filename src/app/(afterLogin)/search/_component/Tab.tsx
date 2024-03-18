@@ -8,15 +8,22 @@ const Tab = () => {
   const [current, setCurrent] = useState("hot");
   const router = useRouter();
   const searchParams = useSearchParams();
-  console.log(searchParams)
+  console.log(searchParams.get('q'))
+
+  // 검색필터 사용시 if문이 true가 되어  q="제로초"&pf=on 이런식으로 붙음
   const onClickHot = () => {
     setCurrent("hot");
-    router.replace(`/search?q=${searchParams.get("q")}`);
+    const newSearchParams = new URLSearchParams(searchParams);
+    newSearchParams.delete('f');
+    router.replace(`/search?${newSearchParams.toString()}`);
   };
+
   const onClickNew = () => {
     setCurrent("new");
+    const newSearchParams = new URLSearchParams(searchParams);
+    newSearchParams.set('f','live');
     // 기존의 주소를 사용하고 새 주소를 뒤에붙일때 toString()
-    router.replace(`/search?${searchParams.toString()}&f=live`);
+    router.replace(`/search?${newSearchParams.toString()}`);
   };
   return (
     <div className={style.homeFixed}>

@@ -1,16 +1,26 @@
 "use client";
 import style from "@/app/(afterLogin)/_component/rightSearchZone.module.css";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import SearchForm from "./SearchForm";
 
 const RightSearchZone = () => {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const router = useRouter();
 
-  const onChangeAll = (e:any) => {
-    console.log(e.target.checked)
+
+  // defaultChecked 말고 다른 버튼 눌렀을때 표시
+  const onChangeFollow = () => {
+    const newSearchParams = new URLSearchParams(searchParams);
+    newSearchParams.set('pf','on');
+    router.replace(`/search?${newSearchParams.toString()}`);
   };
-  const onChangeFollow = (e:any) => {
-    e.target.checked
+
+  // defaultChecked 버튼 눌렀을때 주소값 되돌아옴
+  const onChangeAll = () => {
+    const newSearchParams = new URLSearchParams(searchParams);
+    newSearchParams.delete('pf');
+    router.replace(`/search?${newSearchParams.toString()}`);
   };
 
   if (pathname === "/explore") {
