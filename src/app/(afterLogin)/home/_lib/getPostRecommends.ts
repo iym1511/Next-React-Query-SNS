@@ -1,6 +1,11 @@
 /** 데이터를 불러오는 곳 */
-export async function getPostRecommends() {
-  const res = await fetch(`http://localhost:9090/api/postRecommends`, {
+
+type Props = {
+  pageParam? : number;
+}
+
+export async function getPostRecommends({pageParam} : Props) {
+  const res = await fetch(`http://localhost:9090/api/postRecommends?=cursor${pageParam}`, {
     next: {
       tags: ["posts", "recommends"],
     },
