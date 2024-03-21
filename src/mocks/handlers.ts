@@ -15,6 +15,9 @@ const User = [
   {id: 'leoturtle', nickname: '레오', image: faker.image.avatar()},
 ]
 const Posts = [];
+const delay = (ms: number) => new Promise((res) => {
+  setTimeout(res, ms);
+})
 
 export const handlers = [
   http.post('/api/login', () => {
@@ -44,7 +47,8 @@ export const handlers = [
       }
     })
   }),
-  http.get('/api/postRecommends', ({ request }) => {
+  http.get('/api/postRecommends', async ({ request }) => {
+    await delay(3000);
     const url = new URL(request.url)
     const cursor = parseInt(url.searchParams.get('cursor') as string) || 0
     return HttpResponse.json(
@@ -99,7 +103,8 @@ export const handlers = [
       ]
     )
   }),
-  http.get('/api/followingPosts', ({ request }) => {
+  http.get('/api/followingPosts', async ({ request }) => {
+    await delay(3000);
     return HttpResponse.json(
       [
         {
@@ -182,7 +187,6 @@ export const handlers = [
       ]
     )
   }),
-  // 특정 유저의 게시글 & 내 게시글
   http.get('/api/users/:userId/posts', ({ request, params }) => {
     const { userId } = params;
     return HttpResponse.json(
@@ -225,25 +229,20 @@ export const handlers = [
       ]
     )
   }),
-  // 특정 사용자
   http.get('/api/users/:userId', ({ request, params }): StrictResponse<any> => {
     const {userId} = params;
     const found = User.find((v) => v.id === userId);
-
-    // 유저 찾으면
     if (found) {
       return HttpResponse.json(
         found,
       );
     }
-    // 에러
     return HttpResponse.json({ message: 'no_such_user' }, {
       status: 404,
     })
   }),
   http.get('/api/posts/:postId', ({ request, params }): StrictResponse<any> => {
     const {postId} = params;
-    // 에러나는 경우
     if (parseInt(postId as string) > 10) {
       return HttpResponse.json({ message: 'no_such_post' }, {
         status: 404,
@@ -305,11 +304,9 @@ export const handlers = [
       ]
     )
   }),
-  // 팔로우 추천 대상
   http.get('/api/followRecommends', ({ request}) => {
     return HttpResponse.json(User);
   }),
-  // 최근 트렌드 (해시태그의 검색결과)
   http.get('/api/trends', ({ request }) => {
     return HttpResponse.json(
       [

@@ -33,5 +33,5 @@ const Home = async () => {
     </main>
   );
 };
-
+// 제로초 12:19
 export default Home;
