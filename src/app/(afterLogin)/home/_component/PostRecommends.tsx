@@ -4,6 +4,7 @@ import {
   InfiniteData,
   useInfiniteQuery,
   useQuery,
+  useSuspenseInfiniteQuery,
 } from "@tanstack/react-query";
 import { getPostRecommends } from "../_lib/getPostRecommends";
 import Post from "@/app/(afterLogin)/_component/Post";
@@ -15,8 +16,8 @@ import styles from '../home.module.css';
 
 const PostRecommends = () => {
   // isFetching 리액트 쿼리가 데이터를 가져오는순간(로딩)
-  const { data, fetchNextPage, hasNextPage, isFetching, isPending, isLoading } =
-    useInfiniteQuery<
+  const { data, fetchNextPage, hasNextPage, isFetching, isPending, isLoading, isError } =
+    useSuspenseInfiniteQuery<
       IPost[],
       Object,
       InfiniteData<IPost[]>,
@@ -33,7 +34,7 @@ const PostRecommends = () => {
 
   const { ref, inView } = useInView({
     threshold: 0, // ref영역이 보이고 나서 몇 픽셀 정도의 이벤트가 호출되는가(보이자마자 호출할거라서 0)
-    delay: 2, // 화면에 보이고 나서 얼마있다가 다시 데이터를 불러올것인가
+    delay: 0, // 화면에 보이고 나서 얼마있다가 다시 데이터를 불러올것인가
   });
 
   // ref영역이 보이면 inView가 true가 되면서 useEffect 작동
@@ -44,20 +45,24 @@ const PostRecommends = () => {
     }
   }, [inView, hasNextPage, isFetching, fetchNextPage]);
 
+  
+  // if(isError) {
+  //   return "에러!"
+  // }
+
   // 데이터 가져오는동안 로딩
-  if(isPending){
-    setTimeout(()=>{},3000)
-    return (
-      <div style={{ display: 'flex', justifyContent: 'center' }}>
-        <svg className={styles.loader} height="100%" viewBox="0 0 32 32" width={40} >
-          <circle cx="16" cy="16" fill="none" r="14" strokeWidth="4"
-                  style={{stroke: 'rgb(29, 155, 240)', opacity: 0.2}}></circle>
-          <circle cx="16" cy="16" fill="none" r="14" strokeWidth="4"
-                  style={{stroke: 'rgb(29, 155, 240)', strokeDasharray: 80, strokeDashoffset: 60}}></circle>
-        </svg>
-      </div>
-    )
-  }
+  // if(isPending){
+  //   return (
+  //     <div style={{ display: 'flex', justifyContent: 'center' }}>
+  //       <svg className={styles.loader} height="100%" viewBox="0 0 32 32" width={40} >
+  //         <circle cx="16" cy="16" fill="none" r="14" strokeWidth="4"
+  //                 style={{stroke: 'rgb(29, 155, 240)', opacity: 0.2}}></circle>
+  //         <circle cx="16" cy="16" fill="none" r="14" strokeWidth="4"
+  //                 style={{stroke: 'rgb(29, 155, 240)', strokeDasharray: 80, strokeDashoffset: 60}}></circle>
+  //       </svg>
+  //     </div>
+  //   )
+  // }
 
   // prop이 있으면 2차원 배열에 map의 key를 넣을때 Fragment사용
   return (
@@ -69,7 +74,7 @@ const PostRecommends = () => {
           ))}
         </Fragment>
       ))}
-      <div ref={ref} style={{ height: "10px" }}></div>
+      <div ref={ref} style={{ height: "50px" }}></div>
     </>
   );
 };

@@ -48,9 +48,9 @@ export const handlers = [
     })
   }),
   http.get('/api/postRecommends', async ({ request }) => {
-    await delay(3000);
     const url = new URL(request.url)
     const cursor = parseInt(url.searchParams.get('cursor') as string) || 0
+    await delay(3000);
     return HttpResponse.json(
       [
         {
