@@ -3,12 +3,19 @@
 import { signOut, useSession } from "next-auth/react";
 import style from "./logoutButton.module.css";
 import { useRouter } from "next/navigation";
+import { Session } from "@auth/core/types";
 
-export default function LogoutButton() {
+type Props=  {
+  me : Session | null
+}
+
+export default function LogoutButton({me} : Props) {
 
   const router = useRouter();
-  const { data: me } = useSession();
-  console.log(me)
+  // 회원가입을 하자마자 로그인 하면 이 값이 없어지므로
+  // 상위 컴포넌트에서 auth 의 session을 props 받아서 사용
+  // const { data: me } = useSession();
+  // console.log(me)
   const onLogout = () => {
     signOut({redirect : false})
     .then(() => {

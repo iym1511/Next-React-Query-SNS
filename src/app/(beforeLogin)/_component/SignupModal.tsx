@@ -1,38 +1,39 @@
-"use client"
+"use client";
 
 import BackButton from "@/app/(afterLogin)/_component/BackButton";
 import style from "./signup.module.css";
-import onSubmit from "../_lib/signup"
+import onSubmit from "../_lib/signup";
 import { useFormState, useFormStatus } from "react-dom";
 
 /* 글로벌 서비스를 할때 언어별 오류메시지 */
-const showMessage = (message?: string) => {
-  if(message === 'no_id'){
-    return '아이디를 입력하세요'
+const showMessage = (message?: string | null) => {
+  if (message === "no_id") {
+    return "아이디를 입력하세요";
   }
-  if(message === 'no_name'){
-    return '닉네임을 입력하세요'
+  if (message === "no_name") {
+    return "닉네임을 입력하세요";
   }
-  if(message === 'no_password'){
-    return '비밀번호를 입력하세요'
+  if (message === "no_password") {
+    return "비밀번호를 입력하세요";
   }
-  if(message === 'no_image'){
-    return '이미지를 업로드하세요'
+  if (message === "no_image") {
+    return "이미지를 업로드하세요";
   }
-  if(message === 'no_exists'){
-    return '이미 사용중인 아이디입니다'
+  if (message === "no_exists") {
+    return "이미 사용중인 아이디입니다";
   }
-  return '';
-}
+  return "";
+};
 
 export default function SignupModal() {
-
   // [state(함수에서 return되는 값), formAction(사용할 함수)]  =  (폼 스테이트에서 관리하는 함수, 반환값 기본형태)
-  const [state, formAction] = useFormState(onSubmit, { message : ''});
+  const [state, formAction] = useFormState(onSubmit, { message: null });
   // 처리중일때 가입버튼 활성x
   const { pending } = useFormStatus();
-  console.log(pending)
-  console.log(state?.message)
+  console.log(pending);
+  console.log(state?.message);
+  console.log(state);
+
   return (
     <>
       <div className={style.modalBackground}>
@@ -53,9 +54,7 @@ export default function SignupModal() {
                   className={style.input}
                   type="text"
                   placeholder=""
-                  // value={id}
-                  // onChange={onChangeId}
-                  // required
+                  required
                 />
               </div>
               <div className={style.inputDiv}>
@@ -68,9 +67,7 @@ export default function SignupModal() {
                   className={style.input}
                   type="text"
                   placeholder=""
-                  // value={nickname}
-                  // onChange={onChangeNickname}
-                  // required
+                  required
                 />
               </div>
               <div className={style.inputDiv}>
@@ -83,9 +80,7 @@ export default function SignupModal() {
                   className={style.input}
                   type="password"
                   placeholder=""
-                  // value={password}
-                  // onChange={onChangePassword}
-                  // required
+                  required
                 />
               </div>
               <div className={style.inputDiv}>
@@ -95,16 +90,19 @@ export default function SignupModal() {
                 <input
                   id="image"
                   name="image"
+                  required
                   className={style.input}
                   type="file"
                   accept="image/*"
-                  // onChange={onChangeImageFile}
-                  // required
                 />
               </div>
             </div>
             <div className={style.modalFooter}>
-              <button type="submit" className={style.actionButton} disabled={pending}>
+              <button
+                type="submit"
+                className={style.actionButton}
+                disabled={pending}
+              >
                 가입하기
               </button>
               <div className={style.error}>{showMessage(state?.message)}</div>

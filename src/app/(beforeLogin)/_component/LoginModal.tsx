@@ -20,17 +20,24 @@ const LoginModal = () => {
     // 아이디 비밀번호 호출하기
     // 그 외에서 'kakao','google' 을 작성하여 호출 가능
     try{
-      await signIn("credentials", {
+      const response = await signIn("credentials", {
         username: id,
         password,
         // redirect를 True로 해주면 서버쪽에서 리다이렉트를 하기때문에
         // 우리는 클라이언트에서 사용하기때문에 꺼준다.
         redirect: false,
       });
-      router.replace('/home');
+      
+      // 버그로 인해 null로 처리
+      if(response?.error !== null){
+        setMessage("아이디와 비밀번호가 일치하지 않습니다.");
+      }else{
+        router.replace('/home');
+      }
+    
     }catch(err){
-      console.error(err)
-      setMessage("아이디와 비밀번호가 일치하지 않습니다.")
+      console.error(err);
+      setMessage("아이디와 비밀번호가 일치하지 않습니다.");
     }
   };
   

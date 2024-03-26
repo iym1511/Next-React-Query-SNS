@@ -49,7 +49,7 @@ export default async function AfterLoginLayout({ children, modal }: Props) {
                 </nav>
               </>
             )}
-            <LogoutButton />
+            <LogoutButton me={session}/>
           </div>
         </section>
       </header>

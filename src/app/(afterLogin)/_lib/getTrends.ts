@@ -1,9 +1,10 @@
 /** 데이터를 불러오는 곳 */
 export async function getTrends() {
-  const res = await fetch(`http://localhost:9090/api/trends`, {
+  const res = await fetch(`http://localhost:9090/api/hashtags/trends`, {
     next: {
       tags: ["trends"],
     },
+    credentials: 'include',
     cache: 'no-store'
   });
 
