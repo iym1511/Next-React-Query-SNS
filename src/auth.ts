@@ -2,6 +2,8 @@ import NextAuth from "next-auth"
 import CredentialsProvider from "next-auth/providers/credentials";
 import {NextResponse} from "next/server";
 import axios from 'axios'
+import { cookies } from "next/headers";
+import cookie from "cookie";
 
 export const {
   handlers: { GET, POST },
@@ -25,6 +27,12 @@ export const {
             password: credentials.password,
           }),
         })
+        let setCookie = authResponse.headers.get('Set-Cookie');
+        console.log('set-cookie', setCookie);
+        if (setCookie) {
+          const parsed = cookie.parse(setCookie);
+          cookies().set('connect.sid', parsed['connect.sid'], parsed); // 브라우저에 쿠키를 심어주는 것
+        }
 
         console.log("fetch executed");
 

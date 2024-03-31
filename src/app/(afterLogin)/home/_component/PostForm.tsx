@@ -5,6 +5,8 @@ import style from './postForm.module.css';
 import { useSession } from "next-auth/react";
 import { Session } from "@auth/core/types";
 import TextareaAutosize from 'react-textarea-autosize';
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { Post } from "@/model/Post";
 
 type Props = {
   me : Session | null
@@ -14,6 +16,7 @@ export default function PostForm({me}:Props) {
   const imageRef = useRef<HTMLInputElement>(null);
   const [content, setContent] = useState('');
   const [preview, setPreview] = useState<Array<{dataUrl : string, file : File} | null>>([]);
+  const queryClient = useQueryClient();
 
   const onChange: ChangeEventHandler<HTMLTextAreaElement> = (e) => {
     setContent(e.target.value);
@@ -43,19 +46,41 @@ export default function PostForm({me}:Props) {
     }
   }
 
-  const onSubmit: FormEventHandler = (e) => {
+  const onSubmit: FormEventHandler = async (e) => {
     e.preventDefault();
     const formData = new FormData();
+    console.log(formData);
     formData.append('content', content);
     preview.forEach((p,i) => {
       p && formData.append('images', p.file)
     })
 
-    fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/posts`, {
-      method: 'post',
-      credentials: 'include',
-      body: formData,
-    })
+    try{
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/posts`, {
+        method: 'post',
+        credentials: 'include',
+        body: formData,
+      });
+      if(response.status === 201){
+        setContent('');
+        setPreview([]);
+        const newPost = await response.json();
+        queryClient.setQueryData(['posts', 'recommends'], (prevData: {pages : Post[][]}) => {
+          const shallow = {...prevData, pages: [...prevData.pages]};
+          shallow.pages[0] = [...shallow.pages[0]];
+          prevData.pages[0].unshift(newPost); // 배열 첫번째에 삽입
+          return prevData;
+        });
+        queryClient.setQueryData(['posts', 'followings'], (prevData: {pages : Post[][]}) => {
+          const shallow = {...prevData, pages: [...prevData.pages]};
+          shallow.pages[0] = [...shallow.pages[0]];
+          prevData.pages[0].unshift(newPost);
+          return prevData;
+        });
+      }
+    }catch (err){
+      alert('업로드 중 에러가 발생하였습니다.');
+    }
   }
 
   // imageRef.current가 null 또는 undefined인 경우에는 그냥 undefined를 반환하고, 그렇지 않은 경우에는 click()
