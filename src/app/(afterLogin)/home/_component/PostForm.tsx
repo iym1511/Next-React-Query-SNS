@@ -30,46 +30,49 @@ export default function PostForm({ me }: Props) {
     mutationFn: async (e: FormEvent) => {
       e.preventDefault();
       const formData = new FormData();
-      console.log(formData);
-      formData.append("content", content);
-      preview.forEach((p, i) => {
-        p && formData.append("images", p.file);
+      formData.append('content', content);
+      preview.forEach((p) => {
+        p && formData.append('images', p.file);
       });
-      console.log("eeee",e);
-      // 성공 or 실패는 리액트 쿼리가 알아서 담당해준다.
-      return await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/posts`, {
-        method: "post",
-        credentials: "include",
+
+      return fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/posts`, {
+        method: 'post',
+        credentials: 'include',
         body: formData,
       });
     },
-    async onSuccess(response, variable, context) {
-      setContent("");
-      setPreview([]);
+    async onSuccess(response, variable) {
       const newPost = await response.json();
-      queryClient.setQueryData(
-        ["posts", "recommends"],
-        (prevData: { pages: Post[][] }) => {
-          const shallow = { ...prevData, pages: [...prevData.pages] };
+      setContent('');
+      setPreview([]);
+      if (queryClient.getQueryData(['posts', 'recommends'])) {
+        queryClient.setQueryData(['posts', 'recommends'], (prevData: { pages: Post[][] }) => {
+          const shallow = {
+            ...prevData,
+            pages: [...prevData.pages],
+          };
           shallow.pages[0] = [...shallow.pages[0]];
-          prevData.pages[0].unshift(newPost); // 배열 첫번째에 삽입
-          return prevData;
-        }
-      );
-      queryClient.setQueryData(
-        ["posts", "followings"],
-        (prevData: { pages: Post[][] }) => {
-          const shallow = { ...prevData, pages: [...prevData.pages] };
+          shallow.pages[0].unshift(newPost);
+          return shallow;
+        });
+      }
+      if (queryClient.getQueryData(['posts', 'followings'])) {
+        queryClient.setQueryData(['posts', 'followings'], (prevData: { pages: Post[][] }) => {
+          const shallow = {
+            ...prevData,
+            pages: [...prevData.pages],
+          };
           shallow.pages[0] = [...shallow.pages[0]];
-          prevData.pages[0].unshift(newPost);
-          return prevData;
-        }
-      );
+          shallow.pages[0].unshift(newPost);
+          return shallow;
+        })
+      }
     },
-    onError() {
-      alert("업로드 중 에러가 발생하였습니다.")
-    } 
-  });
+    onError(error) {
+      console.error(error);
+      alert('업로드 중 에러가 발생했습니다.');
+    }
+  })
 
   const onChange: ChangeEventHandler<HTMLTextAreaElement> = (e) => {
     setContent(e.target.value);
@@ -120,24 +123,28 @@ export default function PostForm({ me }: Props) {
         setContent("");
         setPreview([]);
         const newPost = await response.json();
-        queryClient.setQueryData(
-          ["posts", "recommends"],
-          (prevData: { pages: Post[][] }) => {
-            const shallow = { ...prevData, pages: [...prevData.pages] };
-            shallow.pages[0] = [...shallow.pages[0]];
-            prevData.pages[0].unshift(newPost); // 배열 첫번째에 삽입
-            return prevData;
-          }
-        );
-        queryClient.setQueryData(
-          ["posts", "followings"],
-          (prevData: { pages: Post[][] }) => {
-            const shallow = { ...prevData, pages: [...prevData.pages] };
-            shallow.pages[0] = [...shallow.pages[0]];
-            prevData.pages[0].unshift(newPost);
-            return prevData;
-          }
-        );
+        if(queryClient.getQueryData(["posts","recommends"])){
+          queryClient.setQueryData(
+            ["posts", "recommends"],
+            (prevData: { pages: Post[][] }) => {
+              const shallow = { ...prevData, pages: [...prevData.pages] };
+              shallow.pages[0] = [...shallow.pages[0]];
+              prevData.pages[0].unshift(newPost); // 배열 첫번째에 삽입
+              return prevData;
+            }
+          );
+        }
+        if(queryClient.getQueryData(["posts","followings"])){
+          queryClient.setQueryData(
+            ["posts", "followings"],
+            (prevData: { pages: Post[][] }) => {
+              const shallow = { ...prevData, pages: [...prevData.pages] };
+              shallow.pages[0] = [...shallow.pages[0]];
+              prevData.pages[0].unshift(newPost);
+              return prevData;
+            }
+          );
+        }
       }
     } catch (err) {
       alert("업로드 중 에러가 발생하였습니다.");
