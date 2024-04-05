@@ -24,7 +24,7 @@ const PostRecommends = () => {
       [_1: string, _2: string],
       number
     >({
-      queryKey: ["posts", "recommends"],
+      queryKey: ['posts', 'recommends'],
       queryFn: getPostRecommends,
       initialPageParam: 0, // 2차원 배열로 담겨 있다 [[1,2,3,4,5], [6,7,8,9,10], [11,12,13,14,15]]
       getNextPageParam: (lastPage) => lastPage.at(-1)?.postId, // 최근에 불러왔던 데이터 5개 마지막 페이지에 postId
@@ -70,7 +70,7 @@ const PostRecommends = () => {
       {data?.pages.map((page, i) => (
         <Fragment key={i}>
           {page.map((post) => (
-            <Post key={post.postId} post={post} />
+            <Post key={post?.postId} post={post} />
           ))}
         </Fragment>
       ))}

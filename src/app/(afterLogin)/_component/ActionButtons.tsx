@@ -1,24 +1,83 @@
 "use client"
+import { MouseEventHandler } from 'react';
 import style from './post.module.css';
 import cx from 'classnames';
+import { useMutation, useQueryClient } from '@tanstack/react-query'; 
+import { Post } from '@/model/Post';
 
 type Props = {
   white? : boolean;
+  postId: number;
 }
 
-export default function ActionButtons({white}: Props) {
+export default function ActionButtons({white, postId}: Props) {
+  const queryClient = useQueryClient();
   const commented = true;
   const reposted = true;
   const liked = false;
+  const heart = useMutation({
+    mutationFn: () => {
+      return fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/posts/${postId}/heart`, {
+        method: 'post',
+        credentials: 'include',
+      })
+    },
+    // 클릭한 하트 상태를 실시간으로 true로 만들어줌
+    // post에서 검색결과,추천,팔로잉,답글 등등 쿼리키가 다양한대 어떤 쿼리키인지 무슨상황인지 알 수가 없다.
+    // 그래서 전부 다 해줘야 한다.
+    onMutate() {
+      const queryCache = queryClient.getQueryCache();
+      const queryKeys = queryCache.getAll().map(cache => cache.queryKey);
+      console.log('queryKeys',queryKeys);
+      queryKeys.forEach((querykey) => {
+        if(querykey[0] === 'posts') {
+          const value:Post | Post[] | undefined = queryClient.getQueryData(querykey); // 게시글
+          console.log(value)
+          // 싱글포스트 일 수도 있기때문에 조건문 걸어줌.
+          if(Array.isArray(value)){
+            const index = value.findIndex((v) => postId == v.postId);
+            
+            // 찾고자 하는 게시글이 있는지 확인
+            if(index > -1) {
+              const shallow = [...value];
+
+              shallow[index] = {
+                ...shallow[index],
+              }
+              // 옅은 복사해준것을 쿼리에 전송
+              queryClient.setQueryData(querykey, shallow);
+            }
+          }else {
+            // 싱글 포스트인 경우
+          }
+        }
+      });
+    },
+    onError() {
+
+    },
+    onSettled() {
+
+    }
+  })
 
   // 댓글
   const onClickComment = () => {}
 
   // 리트윗
-  const onClickRepost = () => {}
+  const onClickRepost = () => {
+    
+  }
 
   // 좋아요
-  const onClickHeart = () => {}
+  const onClickHeart:MouseEventHandler<HTMLButtonElement> = (e) => {
+    e.stopPropagation();
+    if(liked){
+      // unheart.mutate();
+    }else{
+      heart.mutate();
+    }
+  }
 
   return (
     <div className={style.actionButtons}>
