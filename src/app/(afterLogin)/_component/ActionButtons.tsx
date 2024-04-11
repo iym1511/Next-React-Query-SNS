@@ -2,7 +2,11 @@
 import { MouseEventHandler } from "react";
 import style from "./post.module.css";
 import cx from "classnames";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  InfiniteData,
+  useMutation,
+  useQueryClient,
+} from "@tanstack/react-query";
 import { Post } from "@/model/Post";
 import { useSession } from "next-auth/react";
 
@@ -13,15 +17,23 @@ type Props = {
 
 export default function ActionButtons({ white, post }: Props) {
   const queryClient = useQueryClient();
-  const commented = true;
-  const reposted = true;
-  const liked = false;
   const session = useSession();
-  
+  // find 메서드결과값을 boolean으로 출력해줌 ! : boolean반대, !! : bolean반대의반대
+  const commented = !!post.Comments?.find(
+    (v) => v.userId === session.data?.user?.email
+  );
+  const reposted = !!post.Reposts?.find(
+    (v) => v.userId === session.data?.user?.email
+  );
+  const liked = !!post.Hearts?.find(
+    (v) => v.userId === session.data?.user?.email
+  );
+  const { postId } = post;
+
   const heart = useMutation({
     mutationFn: () => {
       return fetch(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/posts/${post.postId}/heart`,
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/posts/${postId}/heart`,
         {
           method: "post",
           credentials: "include",
@@ -37,23 +49,35 @@ export default function ActionButtons({ white, post }: Props) {
 
       queryKeys.forEach((querykey) => {
         if (querykey[0] === "posts") {
-          const value: Post | Post[] | undefined = queryClient.getQueryData(querykey); // 게시글
-          console.log("벨류",value);
-
+          const value: Post | InfiniteData<Post[]> | undefined =
+            queryClient.getQueryData(querykey); // 게시글
+          console.log("벨류", value);
           // 싱글포스트 일 수도 있기때문에 조건문 걸어줌.
-          if (Array.isArray(value)) {
-            const index = value.findIndex((v) => post.postId == v.postId);
+          // 값이 존재하고 그값이 'pages' 라는 속성을 가지고 있는지 확인
+          if (value && "pages" in value) {
+            // flat으로 2차원배열 평탄화(1차원배열)해서 접근
+            const obj = value.pages.flat().find((v) => v.postId === postId);
+            console.log(obj);
 
-            // 찾고자 하는 게시글이 있는지 확인
-            if (index > -1) {
-              const shallow = [...value];
+            if (obj) {
+              // 존재는 하는지
+              const pageIndex = value.pages.findIndex((page) =>
+                page.includes(obj)
+              );
+              const index = value.pages[pageIndex].findIndex(
+                (v) => v.postId === postId
+              );
+              const shallow = { ...value };
+
               // 옅은복사 (인덱스 페이지로 좋아요누른 페이지에 접근후 작업)
-              shallow[index] = {
-                ...shallow[index],
+              value.pages = { ...value.pages };
+              value.pages[pageIndex] = [...value.pages[pageIndex]];
+              shallow.pages[pageIndex][index] = {
+                ...shallow.pages[pageIndex][index],
                 Hearts: [{ userId: session.data?.user?.email as string }],
                 _count: {
-                  ...shallow[index]._count,
-                  Hearts: shallow[index]._count.Hearts + 1,
+                  ...shallow.pages[pageIndex][index]._count,
+                  Hearts: shallow.pages[pageIndex][index]._count.Hearts + 1,
                 },
               };
               // 옅은 복사해준것을 쿼리에 전송
@@ -61,7 +85,7 @@ export default function ActionButtons({ white, post }: Props) {
             }
           } else if (value) {
             // 싱글 포스트인 경우
-            if (value.postId === post.postId) {
+            if (value.postId === postId) {
               const shallow = {
                 ...value,
                 Hearts: [{ userId: session.data?.user?.email as string }],
@@ -76,7 +100,67 @@ export default function ActionButtons({ white, post }: Props) {
         }
       });
     },
-    onError() {},
+    onError() {
+      const queryCache = queryClient.getQueryCache();
+      const queryKeys = queryCache.getAll().map((cache) => cache.queryKey);
+
+      queryKeys.forEach((querykey) => {
+        if (querykey[0] === "posts") {
+          const value: Post | InfiniteData<Post[]> | undefined =
+            queryClient.getQueryData(querykey); // 게시글
+          console.log("벨류", value);
+          // 싱글포스트 일 수도 있기때문에 조건문 걸어줌.
+          // 값이 존재하고 그값이 'pages' 라는 속성을 가지고 있는지 확인
+          if (value && "pages" in value) {
+            // flat으로 2차원배열 평탄화(1차원배열)해서 접근
+            const obj = value.pages.flat().find((v) => v.postId === postId);
+            console.log(obj);
+
+            if (obj) {
+              // 존재는 하는지
+              const pageIndex = value.pages.findIndex((page) =>
+                page.includes(obj)
+              );
+              const index = value.pages[pageIndex].findIndex(
+                (v) => v.postId === postId
+              );
+              const shallow = { ...value };
+
+              // 옅은복사 (인덱스 페이지로 좋아요누른 페이지에 접근후 작업)
+              value.pages = { ...value.pages };
+              value.pages[pageIndex] = [...value.pages[pageIndex]];
+              shallow.pages[pageIndex][index] = {
+                ...shallow.pages[pageIndex][index],
+                Hearts: shallow.pages[pageIndex][index].Hearts.filter(
+                  (v) => v.userId !== session.data?.user?.email
+                ),
+                _count: {
+                  ...shallow.pages[pageIndex][index]._count,
+                  Hearts: shallow.pages[pageIndex][index]._count.Hearts - 1,
+                },
+              };
+              // 옅은 복사해준것을 쿼리에 전송
+              queryClient.setQueryData(querykey, shallow);
+            }
+          } else if (value) {
+            // 싱글 포스트인 경우
+            if (value.postId === postId) {
+              const shallow = {
+                ...value,
+                Hearts: value.Hearts.filter(
+                  (v) => v.userId !== session.data?.user?.email
+                ),
+                _count: {
+                  ...value._count,
+                  Hearts: value._count.Hearts - 1,
+                },
+              };
+              queryClient.setQueryData(querykey, shallow);
+            }
+          }
+        }
+      });
+    },
     onSettled() {},
   });
 
@@ -97,24 +181,37 @@ export default function ActionButtons({ white, post }: Props) {
 
       queryKeys.forEach((querykey) => {
         if (querykey[0] === "posts") {
-          const value: Post | Post[] | undefined = queryClient.getQueryData(querykey); // 게시글
-          console.log("벨류",value);
-
+          const value: Post | InfiniteData<Post[]> | undefined =
+            queryClient.getQueryData(querykey); // 게시글
+          console.log("벨류", value);
           // 싱글포스트 일 수도 있기때문에 조건문 걸어줌.
-          if (Array.isArray(value)) {
-            const index = value.findIndex((v) => postId == v.postId);
+          // 값이 존재하고 그값이 'pages' 라는 속성을 가지고 있는지 확인
+          if (value && "pages" in value) {
+            // flat으로 2차원배열 평탄화(1차원배열)해서 접근
+            const obj = value.pages.flat().find((v) => v.postId === postId);
+            console.log(obj);
 
-            // 찾고자 하는 게시글이 있는지 확인
-            if (index > -1) {
-              const shallow = [...value];
-              
+            if (obj) {
+              // 존재는 하는지
+              const pageIndex = value.pages.findIndex((page) =>
+                page.includes(obj)
+              );
+              const index = value.pages[pageIndex].findIndex(
+                (v) => v.postId === postId
+              );
+              const shallow = { ...value };
+
               // 옅은복사 (인덱스 페이지로 좋아요누른 페이지에 접근후 작업)
-              shallow[index] = {
-                ...shallow[index],
-                Hearts: shallow[index].Hearts.filter((v) => v.userId !== session.data?.user?.email),
+              value.pages = { ...value.pages };
+              value.pages[pageIndex] = [...value.pages[pageIndex]];
+              shallow.pages[pageIndex][index] = {
+                ...shallow.pages[pageIndex][index],
+                Hearts: shallow.pages[pageIndex][index].Hearts.filter(
+                  (v) => v.userId !== session.data?.user?.email
+                ),
                 _count: {
-                  ...shallow[index]._count,
-                  Hearts: shallow[index]._count.Hearts - 1,
+                  ...shallow.pages[pageIndex][index]._count,
+                  Hearts: shallow.pages[pageIndex][index]._count.Hearts - 1,
                 },
               };
               // 옅은 복사해준것을 쿼리에 전송
@@ -125,7 +222,9 @@ export default function ActionButtons({ white, post }: Props) {
             if (value.postId === postId) {
               const shallow = {
                 ...value,
-                Hearts: value.Hearts.filter((v) => v.userId !== session.data?.user?.email),
+                Hearts: value.Hearts.filter(
+                  (v) => v.userId !== session.data?.user?.email
+                ),
                 _count: {
                   ...value._count,
                   Hearts: value._count.Hearts - 1,
@@ -137,8 +236,68 @@ export default function ActionButtons({ white, post }: Props) {
         }
       });
     },
-    onError() {},
-    onSettled() {},
+    onError() {
+      const queryCache = queryClient.getQueryCache();
+      const queryKeys = queryCache.getAll().map((cache) => cache.queryKey);
+
+      queryKeys.forEach((querykey) => {
+        if (querykey[0] === "posts") {
+          const value: Post | InfiniteData<Post[]> | undefined =
+            queryClient.getQueryData(querykey); // 게시글
+          console.log("벨류", value);
+          // 싱글포스트 일 수도 있기때문에 조건문 걸어줌.
+          // 값이 존재하고 그값이 'pages' 라는 속성을 가지고 있는지 확인
+          if (value && "pages" in value) {
+            // flat으로 2차원배열 평탄화(1차원배열)해서 접근
+            const obj = value.pages.flat().find((v) => v.postId === postId);
+            console.log(obj);
+
+            if (obj) {
+              // 존재는 하는지
+              const pageIndex = value.pages.findIndex((page) =>
+                page.includes(obj)
+              );
+              const index = value.pages[pageIndex].findIndex(
+                (v) => v.postId === postId
+              );
+              const shallow = { ...value };
+
+              // 옅은복사 (인덱스 페이지로 좋아요누른 페이지에 접근후 작업)
+              value.pages = { ...value.pages };
+              value.pages[pageIndex] = [...value.pages[pageIndex]];
+              shallow.pages[pageIndex][index] = {
+                ...shallow.pages[pageIndex][index],
+                Hearts: [{ userId: session.data?.user?.email as string }],
+                _count: {
+                  ...shallow.pages[pageIndex][index]._count,
+                  Hearts: shallow.pages[pageIndex][index]._count.Hearts + 1,
+                },
+              };
+              // 옅은 복사해준것을 쿼리에 전송
+              queryClient.setQueryData(querykey, shallow);
+            }
+          } else if (value) {
+            // 싱글 포스트인 경우
+            if (value.postId === postId) {
+              const shallow = {
+                ...value,
+                Hearts: [{ userId: session.data?.user?.email as string }],
+                _count: {
+                  ...value._count,
+                  Hearts: value._count.Hearts + 1,
+                },
+              };
+              queryClient.setQueryData(querykey, shallow);
+            }
+          }
+        }
+      });
+    },
+    onSettled() {
+      queryClient.invalidateQueries({
+        queryKey: ['posts']
+      })
+    },
   });
 
   // 댓글
@@ -151,7 +310,7 @@ export default function ActionButtons({ white, post }: Props) {
   const onClickHeart: MouseEventHandler<HTMLButtonElement> = (e) => {
     e.stopPropagation();
     if (liked) {
-      // unheart.mutate();
+      unheart.mutate();
     } else {
       heart.mutate();
     }
@@ -173,7 +332,7 @@ export default function ActionButtons({ white, post }: Props) {
             </g>
           </svg>
         </button>
-        <div className={style.count}>{1 || ""}</div>
+        <div className={style.count}>{post._count.Repost || ""}</div>
       </div>
       <div
         className={cx(
@@ -189,7 +348,7 @@ export default function ActionButtons({ white, post }: Props) {
             </g>
           </svg>
         </button>
-        <div className={style.count}>{1 || ""}</div>
+        <div className={style.count}>{post._count.Comments || ""}</div>
       </div>
       <div
         className={cx([
@@ -205,7 +364,7 @@ export default function ActionButtons({ white, post }: Props) {
             </g>
           </svg>
         </button>
-        <div className={style.count}>{0 || ""}</div>
+        <div className={style.count}>{post._count.Hearts || ""}</div>
       </div>
     </div>
   );
