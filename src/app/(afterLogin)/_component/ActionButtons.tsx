@@ -52,25 +52,33 @@ export default function ActionButtons({ white, post }: Props) {
           const value: Post | InfiniteData<Post[]> | undefined =
             queryClient.getQueryData(querykey); // 게시글
           console.log("벨류", value);
+          
           // 싱글포스트 일 수도 있기때문에 조건문 걸어줌.
           // 값이 존재하고 그값이 'pages' 라는 속성을 가지고 있는지 확인
           if (value && "pages" in value) {
             // flat으로 2차원배열 평탄화(1차원배열)해서 접근
+            // obj : 로그인된 아이디로 작성한 게시글 찾아줌
             const obj = value.pages.flat().find((v) => v.postId === postId);
-            console.log(obj);
-
+            
+            
             if (obj) {
-              // 존재는 하는지
+              // pageIndex : 10개씩 뭉처있는 배열이 있는데 
+              // 몇번째 배열에 해당 게시글이 존재하는지 알려줌
               const pageIndex = value.pages.findIndex((page) =>
-                page.includes(obj)
+              page.includes(obj)
               );
+              
+
+              // 뭉처있는 게시글 사이에서 내가 좋아요 누른 게시글 postId가 맞는 index 를 찾아줌
               const index = value.pages[pageIndex].findIndex(
                 (v) => v.postId === postId
-              );
+              )
               const shallow = { ...value };
+              console.log("섈로우 : ",shallow);
 
               // 옅은복사 (인덱스 페이지로 좋아요누른 페이지에 접근후 작업)
-              value.pages = { ...value.pages };
+              value.pages = { ...value.pages }; // 좋아요 개수 상승된 값으로 변경
+              // console.log("옅은복사 value.pages : ", value.pages)
               value.pages[pageIndex] = [...value.pages[pageIndex]];
               shallow.pages[pageIndex][index] = {
                 ...shallow.pages[pageIndex][index],
@@ -189,7 +197,6 @@ export default function ActionButtons({ white, post }: Props) {
           if (value && "pages" in value) {
             // flat으로 2차원배열 평탄화(1차원배열)해서 접근
             const obj = value.pages.flat().find((v) => v.postId === postId);
-            console.log(obj);
 
             if (obj) {
               // 존재는 하는지
@@ -200,7 +207,7 @@ export default function ActionButtons({ white, post }: Props) {
                 (v) => v.postId === postId
               );
               const shallow = { ...value };
-
+              console.log("언하트 섈로우 : ", shallow);
               // 옅은복사 (인덱스 페이지로 좋아요누른 페이지에 접근후 작업)
               value.pages = { ...value.pages };
               value.pages[pageIndex] = [...value.pages[pageIndex]];
