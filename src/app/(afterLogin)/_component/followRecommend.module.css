@@ -34,9 +34,21 @@
 .followButtonSection {
   width: 76px;
 }
+.followButtonSection.followed button {
+  background-color: white;
+  color: black;
+}
+
+.followButtonSection button:hover {
+  background-color: rgb(39, 44, 48);
+}
+
+.followButtonSection.followed button:hover {
+  background-color: lightgray;
+}
 
 .followButtonSection button {
-  border: none;
+  border : 1px solid black;
   cursor: pointer;
   width: 100%;
   color: white;
