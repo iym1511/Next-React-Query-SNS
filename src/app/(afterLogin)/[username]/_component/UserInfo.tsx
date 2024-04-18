@@ -231,17 +231,7 @@ export default function UserInfo({ username }: Props) {
     },
   });
 
-  const onFollow: MouseEventHandler<HTMLButtonElement> = (e) => {
-    e.stopPropagation();
-    e.preventDefault();
 
-    if (followed) {
-      // useMutation에서 매게변수로 쓰이는 인자 전달.
-      unfollow.mutate(user.id);
-    } else {
-      follow.mutate(user.id);
-    }
-  };
 
   if (error) {
     return (
@@ -275,10 +265,21 @@ export default function UserInfo({ username }: Props) {
     return null;
   }
 
+  const onFollow: MouseEventHandler<HTMLButtonElement> = (e) => {
+    e.stopPropagation();
+    e.preventDefault();
+
+    if (followed) {
+      // useMutation에서 매게변수로 쓰이는 인자 전달.
+      unfollow.mutate(user.id);
+    } else {
+      follow.mutate(user.id);
+    }
+  };
+
   const followed = user.Followers?.find(
     (v) => v.userId === session?.user?.email
   );
-    console.log("팔로우드",followed);
 
   return (
     <>
