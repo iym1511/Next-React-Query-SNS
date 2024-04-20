@@ -46,27 +46,33 @@ export default function UserInfo({ username }: Props) {
       ]);
       if (value) {
         const index = value.findIndex((v) => v.id === userId);
+        console.log("벨류 는 뭐니??", value);
         /** 변경된 값 */
-        const shallow = [...value];
-
-        shallow[index] = {
-          ...shallow[index],
-          Followers: [
-            {
-              userId: session?.user?.email as string,
+        if (index > -1) {
+          const shallow = [...value];
+          shallow[index] = {
+            ...shallow[index],
+            Followers: [
+              {
+                userId: session?.user?.email as string,
+              },
+            ],
+            _count: {
+              ...shallow[index]._count,
+              Followers: shallow[index]._count?.Followers + 1,
             },
-          ],
-          _count: {
-            ...shallow[index]._count,
-            Followers: shallow[index]._count?.Followers + 1,
-          },
-        };
-        console.log("index : ", index, "shallow", shallow);
-        queryClient.setQueryData(["users", "followRecommends"], shallow);
+          };
+          console.log("index : ", index, "shallow", shallow);
+          queryClient.setQueryData(["users", "followRecommends"], shallow);
+        }
       }
 
       /** 개인 프로필 팔로우 상태 (post)*/
-      const value2: User | undefined = queryClient.getQueryData(["users", userId]);
+      const value2: User | undefined = queryClient.getQueryData([
+        "users",
+        userId,
+      ]);
+      console.log("벨류 2 : ", value2);
       if (value2) {
         /** 변경된 값 */
         const shallow = {
@@ -90,20 +96,21 @@ export default function UserInfo({ username }: Props) {
       if (value) {
         const index = value.findIndex((v) => v.id === userId);
         /** 변경된 값 */
-        const shallow = [...value];
-
-        shallow[index] = {
-          ...shallow[index],
-          Followers: shallow[index].Followers.filter(
-            (v) => v.userId !== session?.user?.email
-          ), // 본인 제거
-          _count: {
-            ...shallow[index]._count,
-            Followers: shallow[index]._count?.Followers - 1,
-          },
-        };
-        console.log("index : ", index, "shallow", shallow);
-        queryClient.setQueryData(["users", "followRecommends"], shallow);
+        if (index > -1) {
+          const shallow = [...value];
+          shallow[index] = {
+            ...shallow[index],
+            Followers: shallow[index].Followers.filter(
+              (v) => v.userId !== session?.user?.email
+            ), // 본인 제거
+            _count: {
+              ...shallow[index]._count,
+              Followers: shallow[index]._count?.Followers - 1,
+            },
+          };
+          console.log("index : ", index, "shallow", shallow);
+          queryClient.setQueryData(["users", "followRecommends"], shallow);
+        }
       }
 
       /** 개인 프로필 팔로우 상태 (delete)*/
@@ -148,20 +155,21 @@ export default function UserInfo({ username }: Props) {
       if (value) {
         const index = value.findIndex((v) => v.id === userId);
         /** 변경된 값 */
-        const shallow = [...value];
-
-        shallow[index] = {
-          ...shallow[index],
-          Followers: shallow[index].Followers.filter(
-            (v) => v.userId !== session?.user?.email
-          ), // 본인 제거
-          _count: {
-            ...shallow[index]._count,
-            Followers: shallow[index]._count?.Followers - 1,
-          },
-        };
-        console.log("index : ", index, "shallow", shallow);
-        queryClient.setQueryData(["users", "followRecommends"], shallow);
+        if (index > -1) {
+          const shallow = [...value];
+          shallow[index] = {
+            ...shallow[index],
+            Followers: shallow[index].Followers.filter(
+              (v) => v.userId !== session?.user?.email
+            ), // 본인 제거
+            _count: {
+              ...shallow[index]._count,
+              Followers: shallow[index]._count?.Followers - 1,
+            },
+          };
+          console.log("index : ", index, "shallow", shallow);
+          queryClient.setQueryData(["users", "followRecommends"], shallow);
+        }
       }
 
       /** 개인 프로필 팔로우 상태 (delete)*/
@@ -193,22 +201,23 @@ export default function UserInfo({ username }: Props) {
       if (value) {
         const index = value.findIndex((v) => v.id === userId);
         /** 변경된 값 */
-        const shallow = [...value];
-
-        shallow[index] = {
-          ...shallow[index],
-          Followers: [
-            {
-              userId: session?.user?.email as string,
+        if (index > -1) {
+          const shallow = [...value];
+          shallow[index] = {
+            ...shallow[index],
+            Followers: [
+              {
+                userId: session?.user?.email as string,
+              },
+            ],
+            _count: {
+              ...shallow[index]._count,
+              Followers: shallow[index]._count?.Followers + 1,
             },
-          ],
-          _count: {
-            ...shallow[index]._count,
-            Followers: shallow[index]._count?.Followers + 1,
-          },
-        };
-        console.log("index : ", index, "shallow", shallow);
-        queryClient.setQueryData(["users", "followRecommends"], shallow);
+          };
+          console.log("index : ", index, "shallow", shallow);
+          queryClient.setQueryData(["users", "followRecommends"], shallow);
+        }
       }
 
       /** 개인 프로필 팔로우 상태 (post)*/
@@ -230,8 +239,6 @@ export default function UserInfo({ username }: Props) {
       }
     },
   });
-
-
 
   if (error) {
     return (
@@ -261,9 +268,14 @@ export default function UserInfo({ username }: Props) {
       </>
     );
   }
+
   if (!user) {
     return null;
   }
+
+  const followed = user.Followers?.find(
+    (v) => v.userId === session?.user?.email
+  );
 
   const onFollow: MouseEventHandler<HTMLButtonElement> = (e) => {
     e.stopPropagation();
@@ -277,10 +289,6 @@ export default function UserInfo({ username }: Props) {
     }
   };
 
-  const followed = user.Followers?.find(
-    (v) => v.userId === session?.user?.email
-  );
-
   return (
     <>
       <div className={style.header}>
@@ -288,19 +296,28 @@ export default function UserInfo({ username }: Props) {
         <h3 className={style.headerTitle}>{user.nickname}</h3>
       </div>
       <div className={style.userZone}>
-        <div className={style.userImage}>
-          <img src={user.image} alt={user.id} />
+        <div className={style.userRow}>
+          <div className={style.userImage}>
+            <img src={user.image} alt={user.id} />
+          </div>
+          <div className={style.userName}>
+            <div>{user.nickname}</div>
+            <div>@{user.id}</div>
+          </div>
+          {user.id !== session?.user?.email && (
+            <button
+              onClick={onFollow}
+              className={cx(style.followButton, followed && style.followed)}
+            >
+              {followed ? "팔로잉" : "팔로우"}
+            </button>
+          )}
         </div>
-        <div className={style.userName}>
-          <div>{user.nickname}</div>
-          <div>@{user.id}</div>
+        <div className={style.userFollower}>
+          <div>{user._count.Followers} 팔로워</div>
+          &nbsp;
+          <div>{user._count.Followings} 팔로우 중</div>
         </div>
-        
-        {user.id !== session?.user?.email && 
-          <button onClick={onFollow} className={cx(style.followButton, followed && style.followed)}>
-            {followed ? "팔로잉" : "팔로우"}
-          </button>
-        }
       </div>
     </>
   );
