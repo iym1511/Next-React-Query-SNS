@@ -27,7 +27,7 @@ export default function UserInfo({ username }: Props) {
 
   const { data: session } = useSession();
   const queryClient = useQueryClient();
-
+  
   const follow = useMutation({
     mutationFn: (userId: string) => {
       return fetch(
@@ -138,7 +138,7 @@ export default function UserInfo({ username }: Props) {
   const unfollow = useMutation({
     mutationFn: (userId: string) => {
       return fetch(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/user/${userId}/follow`,
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/users/${userId}/follow`,
         {
           method: "delete",
           credentials: "include",
