@@ -6,8 +6,8 @@ import 'dayjs/locale/ko';
 import ActionButtons from "@/app/(afterLogin)/_component/ActionButtons";
 import PostArticle from "@/app/(afterLogin)/_component/PostArticle";
 import PostImages from "@/app/(afterLogin)/_component/PostImages";
-import {Post} from "@/model/Post";
 import { MouseEventHandler } from 'react';
+import { Post } from '@/model/Post';
 
 dayjs.locale('ko');
 dayjs.extend(relativeTime)

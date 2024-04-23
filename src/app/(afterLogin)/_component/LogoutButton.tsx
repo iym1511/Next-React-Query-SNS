@@ -18,6 +18,8 @@ export default function LogoutButton({me} : Props) {
   // 상위 컴포넌트에서 auth 의 session을 props 받아서 사용
   // const { data: me } = useSession();
   // console.log(me)
+
+   // 해당 키값쪽 데이터의 캐시를 날려줌
   const onLogout = () => {
     queryClient.invalidateQueries({
       queryKey : ["posts"],
@@ -27,6 +29,11 @@ export default function LogoutButton({me} : Props) {
     });
     signOut({redirect : false})
     .then(() => {
+      // 백엔드 서버 로그아웃
+      fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/logout`,{
+        method: 'post',
+        credentials: 'include'
+      })
       router.replace('/');
     })
   };
