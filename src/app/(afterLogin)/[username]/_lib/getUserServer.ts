@@ -1,13 +1,11 @@
-import { QueryFunction } from "@tanstack/react-query";
-import { User } from "next-auth";
 import { cookies } from "next/headers";
 
-export const getUserServer: QueryFunction<User, [_1: string, _2: string]>
-  = async ({ queryKey }) => {
-  const [_1, username] = queryKey;
+export const getUserServer
+  = async ({queryKey} : { queryKey : [string, string] }) => {
+    const [_1, username] = queryKey;
   const res = await fetch(`http://localhost:9090/api/users/${username}`, {
     next: {
-      tags: ['user  s', username],
+      tags: ['users', username],
     },
     credentials:'include',
     headers: {
