@@ -29,6 +29,7 @@ export default function Post({ noImage, post }: Props) {
 
   return (
     <PostArticle post={target}>
+      {/* 재게시글 */}
       {post.Original && (
         <div className={style.postReposted}>
           <svg
@@ -67,6 +68,7 @@ export default function Post({ noImage, post }: Props) {
               {dayjs(target.createdAt).fromNow(true)}
             </span>
           </div>
+          {/* 답글 */}
           {target.Parent && <Link href={`/${target.Parent.User.id}`} onClick={stopPropagation}>{target.Parent.User.id}</Link>}
           <div>{target.content}</div>
           {!noImage && (
