@@ -1,4 +1,3 @@
-
 "use client"
 
 import style from "@/app/(afterLogin)/@modal/[username]/status/[id]/photo/[photoId]/photoModal.module.css";
@@ -28,7 +27,7 @@ export default function ImageZone({ id }: Props) {
       <div className={style.image} style={{backgroundImage: `url(${post.Images[0].link})`}}/>
       <div className={style.buttonZone}>
         <div className={style.buttonInner}>
-          <ActionButtons white postId={post?.postId}/>
+          <ActionButtons white post={post}/>
         </div>
       </div>
     </div>

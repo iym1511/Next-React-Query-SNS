@@ -18,6 +18,7 @@ export default function UserPosts({ username }: Props) {
   const queryClient = useQueryClient();
   const user = queryClient.getQueryData(['users', username]);
   console.log('user', user);
+  console.log("왜 400 에러가 뜨지? : ",data)
   if (user) {
     return data?.map((post) => (
       <Post key={post.postId} post={post} />

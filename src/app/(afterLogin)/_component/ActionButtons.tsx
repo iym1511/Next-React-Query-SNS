@@ -18,6 +18,7 @@ type Props = {
 export default function ActionButtons({ white, post }: Props) {
   const queryClient = useQueryClient();
   const session = useSession();
+  console.log("하트다",post.Hearts);
   // find 메서드결과값을 boolean으로 출력해줌 ! : boolean반대, !! : bolean반대의반대
   const commented = !!post.Comments?.find(
     (v) => v.userId === session.data?.user?.email
@@ -308,10 +309,30 @@ export default function ActionButtons({ white, post }: Props) {
   });
 
   // 댓글
-  const onClickComment = () => {};
+  const onClickComment: MouseEventHandler<HTMLButtonElement> = (e) => {
+    e.stopPropagation();
+    const formData = new FormData();
+    formData.append('content', '답글 테스트');
+    fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/posts/${post.postId}/comments`, {
+      method: 'post',
+      credentials: 'include',
+      body: 'formData'
+    });
+  };
 
   // 리트윗
-  const onClickRepost = () => {};
+  const onClickRepost: MouseEventHandler<HTMLButtonElement> = (e) => {
+    e.stopPropagation();
+    if(!reposted){
+      const formData = new FormData();
+      formData.append('content', '재게시 테스트');
+      fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/posts/${post.postId}/reposts`, {
+        method: 'post',
+        credentials: 'include',
+        body: 'formData'
+      });
+    }
+  };
 
   // 좋아요
   const onClickHeart: MouseEventHandler<HTMLButtonElement> = (e) => {
@@ -339,7 +360,7 @@ export default function ActionButtons({ white, post }: Props) {
             </g>
           </svg>
         </button>
-        <div className={style.count}>{post._count.Repost || ""}</div>
+        <div className={style.count}>{post._count.Reposts || ""}</div>
       </div>
       <div
         className={cx(
