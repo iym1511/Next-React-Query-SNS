@@ -18,7 +18,7 @@ type Props = {
 export default function ActionButtons({ white, post }: Props) {
   const queryClient = useQueryClient();
   const session = useSession();
-  console.log("하트다",post.Hearts);
+  console.log("하트다", post.Hearts);
   // find 메서드결과값을 boolean으로 출력해줌 ! : boolean반대, !! : bolean반대의반대
   const commented = !!post.Comments?.find(
     (v) => v.userId === session.data?.user?.email
@@ -53,29 +53,27 @@ export default function ActionButtons({ white, post }: Props) {
           const value: Post | InfiniteData<Post[]> | undefined =
             queryClient.getQueryData(querykey); // 게시글
           console.log("벨류", value);
-          
+
           // 싱글포스트 일 수도 있기때문에 조건문 걸어줌.
           // 값이 존재하고 그값이 'pages' 라는 속성을 가지고 있는지 확인
           if (value && "pages" in value) {
             // flat으로 2차원배열 평탄화(1차원배열)해서 접근
             // obj : 로그인된 아이디로 작성한 게시글 찾아줌
             const obj = value.pages.flat().find((v) => v.postId === postId);
-            
-            
+
             if (obj) {
-              // pageIndex : 10개씩 뭉처있는 배열이 있는데 
+              // pageIndex : 10개씩 뭉처있는 배열이 있는데
               // 몇번째 배열에 해당 게시글이 존재하는지 알려줌
               const pageIndex = value.pages.findIndex((page) =>
-              page.includes(obj)
+                page.includes(obj)
               );
-              
 
               // 뭉처있는 게시글 사이에서 내가 좋아요 누른 게시글 postId가 맞는 index 를 찾아줌
               const index = value.pages[pageIndex].findIndex(
                 (v) => v.postId === postId
-              )
+              );
               const shallow = { ...value };
-              console.log("섈로우 : ",shallow);
+              console.log("리포스트테스트 : ", shallow.pages)
 
               // 옅은복사 (인덱스 페이지로 좋아요누른 페이지에 접근후 작업)
               value.pages = { ...value.pages }; // 좋아요 개수 상승된 값으로 변경
@@ -258,7 +256,6 @@ export default function ActionButtons({ white, post }: Props) {
           if (value && "pages" in value) {
             // flat으로 2차원배열 평탄화(1차원배열)해서 접근
             const obj = value.pages.flat().find((v) => v.postId === postId);
-            console.log(obj);
 
             if (obj) {
               // 존재는 하는지
@@ -303,8 +300,163 @@ export default function ActionButtons({ white, post }: Props) {
     },
     onSettled() {
       queryClient.invalidateQueries({
-        queryKey: ['posts']
-      })
+        queryKey: ["posts"],
+      });
+    },
+  });
+
+  const repost = useMutation({
+    mutationFn: () => {
+      return fetch(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/posts/${post.postId}/reposts`,
+        {
+          method: "post",
+          credentials: "include",
+        }
+      );
+    },
+    async onSuccess(response) {
+      const data = await response.json();
+      const queryCache = queryClient.getQueryCache();
+      const queryKeys = queryCache.getAll().map((cache) => cache.queryKey);
+      queryKeys.forEach((querykey) => {
+        if (querykey[0] === "posts") {
+          const value: Post | InfiniteData<Post[]> | undefined =
+            queryClient.getQueryData(querykey); // 게시글
+            
+            // 싱글포스트 일 수도 있기때문에 조건문 걸어줌.
+            // 값이 존재하고 그값이 'pages' 라는 속성을 가지고 있는지 확인
+            if (value && "pages" in value) {
+              // flat으로 2차원배열 평탄화(1차원배열)해서 접근
+              // obj : 로그인된 아이디로 작성한 게시글 찾아줌
+              const obj = value.pages.flat().find((v) => v.postId === postId);
+              
+              if (obj) {
+                // pageIndex : 10개씩 뭉처있는 배열이 있는데
+                // 몇번째 배열에 해당 게시글이 존재하는지 알려줌
+                const pageIndex = value.pages.findIndex((page) =>
+                  page.includes(obj)
+              );
+
+              // 뭉처있는 게시글 사이에서 내가 좋아요 누른 게시글 postId가 맞는 index 를 찾아줌
+              const index = value.pages[pageIndex].findIndex(
+                (v) => v.postId === postId
+              );
+              const shallow = { ...value };
+
+              // 옅은복사 (인덱스 페이지로 좋아요누른 페이지에 접근후 작업)
+              value.pages = { ...value.pages }; // 좋아요 개수 상승된 값으로 변경
+              // console.log("옅은복사 value.pages : ", value.pages)
+              value.pages[pageIndex] = [...value.pages[pageIndex]];
+              shallow.pages[pageIndex][index] = {
+                ...shallow.pages[pageIndex][index],
+                Reposts: [{ userId: session.data?.user?.email as string }],
+                _count: {
+                  ...shallow.pages[pageIndex][index]._count,
+                  Reposts: shallow.pages[pageIndex][index]._count.Reposts + 1,
+                },
+              };
+              shallow.pages[0].unshift(data);
+              // 옅은 복사해준것을 쿼리에 전송
+              queryClient.setQueryData(querykey, shallow);
+            }
+          } else if (value) {
+            // 싱글 포스트인 경우
+            if (value.postId === postId) {
+              const shallow = {
+                ...value,
+                Reposts: [{ userId: session.data?.user?.email as string }],
+                _count: {
+                  ...value._count,
+                  Reposts: value._count.Reposts + 1,
+                },
+              };
+              queryClient.setQueryData(querykey, shallow);
+            }
+          }
+          
+        }
+      });
+    },
+  });
+
+  const deleteRepost = useMutation({
+    mutationFn: () => {
+      return fetch(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/posts/${post.postId}/reposts`,
+        {
+          method: "delete",
+          credentials: "include",
+        }
+      );
+    },
+    onSuccess() {
+      const queryCache = queryClient.getQueryCache();
+      const queryKeys = queryCache.getAll().map((cache) => cache.queryKey);
+
+      queryKeys.forEach((querykey) => {
+        if (querykey[0] === "posts") {
+          const value: Post | InfiniteData<Post[]> | undefined =
+            queryClient.getQueryData(querykey); // 게시글
+          
+          // 싱글포스트 일 수도 있기때문에 조건문 걸어줌.
+          // 값이 존재하고 그값이 'pages' 라는 속성을 가지고 있는지 확인
+          if (value && "pages" in value) {
+            // flat으로 2차원배열 평탄화(1차원배열)해서 접근
+            const obj = value.pages.flat().find((v) => v.postId === postId);
+            // 재게시글이 있는지 && 유저가 일치하는지
+            const repost = value.pages.flat().find((v)=> v.Original?.postId === postId && v.User.id === session?.data?.user?.email);
+            if (obj) {
+              // 존재는 하는지
+              const pageIndex = value.pages.findIndex((page) =>
+                page.includes(obj)
+              );
+              const index = value.pages[pageIndex].findIndex(
+                (v) => v.postId === postId
+              );
+              const shallow = { ...value };
+
+              // 옅은복사 (인덱스 페이지로 좋아요누른 페이지에 접근후 작업)
+              value.pages = { ...value.pages };
+              value.pages[pageIndex] = [...value.pages[pageIndex]];
+              shallow.pages[pageIndex][index] = {
+                ...shallow.pages[pageIndex][index],
+                Reposts: shallow.pages[pageIndex][index].Reposts.filter(
+                  (v) => v.userId !== session.data?.user?.email
+                ),
+                _count: {
+                  ...shallow.pages[pageIndex][index]._count,
+                  Reposts: shallow.pages[pageIndex][index]._count.Reposts - 1,
+                },
+              };
+
+              // 재게시 삭제
+              // 재게시글이 어떤 페이지에 있는지 모르니까 모든페이지를 한번씩 돌아본다.
+              shallow.pages = shallow.pages.map((page) => {
+                return page.filter((v) => v.postId !== repost?.postId)
+              })
+              // 옅은 복사해준것을 쿼리에 전송
+              queryClient.setQueryData(querykey, shallow);
+              console.log("리포스트테스트 : ", shallow.pages)
+            }
+          } else if (value) {
+            // 싱글 포스트인 경우
+            if (value.postId === postId) {
+              const shallow = {
+                ...value,
+                Reposts: value.Reposts.filter(
+                  (v) => v.userId !== session.data?.user?.email
+                ),
+                _count: {
+                  ...value._count,
+                  Reposts: value._count.Reposts - 1,
+                },
+              };
+              queryClient.setQueryData(querykey, shallow);
+            }
+          }
+        }
+      });
     },
   });
 
@@ -312,25 +464,24 @@ export default function ActionButtons({ white, post }: Props) {
   const onClickComment: MouseEventHandler<HTMLButtonElement> = (e) => {
     e.stopPropagation();
     const formData = new FormData();
-    formData.append('content', '답글 테스트');
-    fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/posts/${post.postId}/comments`, {
-      method: 'post',
-      credentials: 'include',
-      body: 'formData'
-    });
+    formData.append("content", "답글 테스트");
+    fetch(
+      `${process.env.NEXT_PUBLIC_BASE_URL}/api/posts/${post.postId}/comments`,
+      {
+        method: "post",
+        credentials: "include",
+        body: formData,
+      }
+    );
   };
 
-  // 리트윗
+  // 재게시
   const onClickRepost: MouseEventHandler<HTMLButtonElement> = (e) => {
     e.stopPropagation();
-    if(!reposted){
-      const formData = new FormData();
-      formData.append('content', '재게시 테스트');
-      fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/posts/${post.postId}/reposts`, {
-        method: 'post',
-        credentials: 'include',
-        body: 'formData'
-      });
+    if (!reposted) {
+      repost.mutate();
+    } else {
+      deleteRepost.mutate();
     }
   };
 
