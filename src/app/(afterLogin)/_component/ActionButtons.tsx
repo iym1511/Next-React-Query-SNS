@@ -115,7 +115,7 @@ export default function ActionButtons({ white, post }: Props) {
         if (querykey[0] === "posts") {
           const value: Post | InfiniteData<Post[]> | undefined =
             queryClient.getQueryData(querykey); // 게시글
-          console.log("벨류", value);
+
           // 싱글포스트 일 수도 있기때문에 조건문 걸어줌.
           // 값이 존재하고 그값이 'pages' 라는 속성을 가지고 있는지 확인
           if (value && "pages" in value) {
@@ -357,6 +357,8 @@ export default function ActionButtons({ white, post }: Props) {
                 },
               };
               shallow.pages[0].unshift(data);
+              console.log("리포스트테스트 추가부분 : ", shallow.pages);
+              console.log("리포스트테스트 추가부분 value.pages : ", value.pages);
               // 옅은 복사해준것을 쿼리에 전송
               queryClient.setQueryData(querykey, shallow);
             }
@@ -432,12 +434,14 @@ export default function ActionButtons({ white, post }: Props) {
 
               // 재게시 삭제
               // 재게시글이 어떤 페이지에 있는지 모르니까 모든페이지를 한번씩 돌아본다.
+              // repost게시글 안에 postId와 현재 게시글의 postId가 일치하지않는 것을 게시글 목록에서 제거한다
               shallow.pages = shallow.pages.map((page) => {
                 return page.filter((v) => v.postId !== repost?.postId)
               })
               // 옅은 복사해준것을 쿼리에 전송
               queryClient.setQueryData(querykey, shallow);
-              console.log("리포스트테스트 : ", shallow.pages)
+              console.log("리포스트테스트 삭제부분 : ", shallow.pages);
+              console.log("리포스트테스트 삭제부분 value.pages : ", value.pages);
             }
           } else if (value) {
             // 싱글 포스트인 경우
