@@ -16,6 +16,7 @@ type Props = {
   noImage?: boolean;
   post: PostType;
 };
+
 export default function Post({ noImage, post }: Props) {
   let target = post;
 

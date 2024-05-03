@@ -2,26 +2,124 @@
 
 import { useSession } from "next-auth/react";
 import style from "./modal.module.css";
-import { useRef, useState } from "react";
+import { ChangeEventHandler, FormEvent, FormEventHandler, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import TextareaAutosize from "react-textarea-autosize";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useModalState } from "@/store/modal";
+import { Post } from "@/model/Post";
 
 export default function TweetModal() {
   const router = useRouter();
-  const [content, setContent] = useState();
+  const [preview, setPreview] = useState<Array<{ dataUrl: string; file: File } | null>>([]);
+  const [content, setContent] = useState("");
+  const queryClient = useQueryClient();
   const imageRef = useRef<HTMLInputElement>(null);
-  const { data : me } = useSession();
+  const { data: me } = useSession();
+  const modalStore = useModalState();
 
-  const onSubmit = () => {};
+  const mutation = useMutation({
+    mutationFn: async (e: FormEvent) => {
+      e.preventDefault();
+      const formData = new FormData();
+      formData.append("content", content);
+      preview.forEach((p) => {
+        p && formData.append("images", p.file);
+      });
+      return fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/posts`, {
+        method: "post",
+        credentials: "include",
+        body: formData,
+      });
+    },
+    async onSuccess(response, variable) {
+      const newPost = await response.json();
+      setContent("");
+      setPreview([]);
+      if (queryClient.getQueryData(["posts", "recommends"])) {
+        queryClient.setQueryData(
+          ["posts", "recommends"],
+          (prevData: { pages: Post[][] }) => {
+            const shallow = {
+              ...prevData,
+              pages: [...prevData.pages],
+            };
+            shallow.pages[0] = [...shallow.pages[0]];
+            shallow.pages[0].unshift(newPost);
+            return shallow;
+          }
+        );
+      }
+      if (queryClient.getQueryData(["posts", "followings"])) {
+        queryClient.setQueryData(
+          ["posts", "followings"],
+          (prevData: { pages: Post[][] }) => {
+            const shallow = {
+              ...prevData,
+              pages: [...prevData.pages],
+            };
+            shallow.pages[0] = [...shallow.pages[0]];
+            shallow.pages[0].unshift(newPost);
+            return shallow;
+          }
+        );
+      }
+    },
+    onError(error) {
+      console.error(error);
+      alert("업로드 중 에러가 발생했습니다.");
+    },
+  });
+
+  const comment = useMutation({});
+
+  const onChange: ChangeEventHandler<HTMLTextAreaElement> = (e) => {
+    setContent(e.target.value);
+  };
+
+  const onClickButton = () => {
+    imageRef.current?.click();
+  };
+
+  const onRemoveImage = (index: number) => () => {
+    setPreview((prevPreview) => {
+      const prev = [...prevPreview];
+      prev[index] = null;
+      return prev;
+    });
+  };
+
+  const onUpload: ChangeEventHandler<HTMLInputElement> = (e) => {
+    e.preventDefault();
+    if (e.target.files) {
+      Array.from(e.target.files).forEach((file, index) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setPreview((prevPreview) => {
+            const prev = [...prevPreview];
+            prev[index] = {
+              dataUrl: reader.result as string,
+              file,
+            };
+            return prev;
+          });
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+  };
+
+  const onSubmit: FormEventHandler<HTMLFormElement> = (e) => {
+    if (modalStore.mode === "new") {
+      mutation.mutate(e);
+    } else {
+      comment.mutate();
+    }
+  };
+
   const onClickClose = () => {
     router.back();
   };
-  const onClickButton = () => {};
-  const onChangeContent = () => {};
-
-  // const me = {
-  //   id: "zerohch0",
-  //   image: "/5Udwvqim.jpg",
-  // };
 
   return (
     <div className={style.modalBackground}>
@@ -42,16 +140,39 @@ export default function TweetModal() {
           <div className={style.modalBody}>
             <div className={style.postUserSection}>
               <div className={style.postUserImage}>
-                <img src={me?.user?.image as string} alt={me?.user?.email as string} />
+                <img
+                  src={me?.user?.image as string}
+                  alt={me?.user?.email as string}
+                />
               </div>
             </div>
             <div className={style.inputDiv}>
-              <textarea
+              <TextareaAutosize
                 className={style.input}
                 placeholder="무슨 일이 일어나고 있나요?"
                 value={content}
-                onChange={onChangeContent}
+                onChange={onChange}
               />
+              {preview.map(
+                (v, index) =>
+                  v && (
+                    <div
+                      key={index}
+                      style={{ flex: 1 }}
+                      onClick={onRemoveImage(index)}
+                    >
+                      <img
+                        src={v.dataUrl}
+                        alt="미리보기"
+                        style={{
+                          width: "100%",
+                          objectFit: "contain",
+                          maxHeight: 100,
+                        }}
+                      ></img>
+                    </div>
+                  )
+              )}
             </div>
           </div>
           <div className={style.modalFooter}>
@@ -64,6 +185,7 @@ export default function TweetModal() {
                   multiple
                   hidden
                   ref={imageRef}
+                  onChange={onUpload}
                 />
                 <button
                   className={style.uploadButton}

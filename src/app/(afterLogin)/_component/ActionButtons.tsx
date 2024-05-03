@@ -9,6 +9,8 @@ import {
 } from "@tanstack/react-query";
 import { Post } from "@/model/Post";
 import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { useModalState } from "@/store/modal";
 
 type Props = {
   white?: boolean;
@@ -20,9 +22,12 @@ export default function ActionButtons({ white, post }: Props) {
   const session = useSession();
   console.log("하트다", post.Hearts);
   // find 메서드결과값을 boolean으로 출력해줌 ! : boolean반대, !! : bolean반대의반대
-  const commented = !!post.Comments?.find(
-    (v) => v.userId === session.data?.user?.email
-  );
+  // const commented = !!post.Comments?.find(
+  //   (v) => v.userId === session.data?.user?.email
+  // );
+  const modalStore = useModalState();
+  const router = useRouter();
+
   const reposted = !!post.Reposts?.find(
     (v) => v.userId === session.data?.user?.email
   );
@@ -467,16 +472,9 @@ export default function ActionButtons({ white, post }: Props) {
   // 댓글
   const onClickComment: MouseEventHandler<HTMLButtonElement> = (e) => {
     e.stopPropagation();
-    const formData = new FormData();
-    formData.append("content", "답글 테스트");
-    fetch(
-      `${process.env.NEXT_PUBLIC_BASE_URL}/api/posts/${post.postId}/comments`,
-      {
-        method: "post",
-        credentials: "include",
-        body: formData,
-      }
-    );
+    modalStore.setMode('comment');
+    modalStore.setData(post);
+    router.push('/compose/tweet');
   };
 
   // 재게시
@@ -504,7 +502,6 @@ export default function ActionButtons({ white, post }: Props) {
       <div
         className={cx(
           style.commentButton,
-          { [style.commented]: commented },
           white && style.white
         )}
       >
