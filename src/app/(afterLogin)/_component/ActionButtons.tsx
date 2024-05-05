@@ -323,11 +323,11 @@ export default function ActionButtons({ white, post }: Props) {
     async onSuccess(response) {
       const data = await response.json();
       const queryCache = queryClient.getQueryCache();
+      // 각 쿼리의 key정보와 캐시된 데이터를 배열형태로 풀어준다.
       const queryKeys = queryCache.getAll().map((cache) => cache.queryKey);
       queryKeys.forEach((querykey) => {
         if (querykey[0] === "posts") {
-          const value: Post | InfiniteData<Post[]> | undefined =
-            queryClient.getQueryData(querykey); // 게시글
+          const value: Post | InfiniteData<Post[]> | undefined = queryClient.getQueryData(querykey); // 게시글
             
             // 싱글포스트 일 수도 있기때문에 조건문 걸어줌.
             // 값이 존재하고 그값이 'pages' 라는 속성을 가지고 있는지 확인

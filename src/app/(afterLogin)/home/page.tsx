@@ -15,7 +15,6 @@ export const metadata: Metadata = {
 
 const Home =  async () => {
 
-
   const session = await auth();
 
   return (
