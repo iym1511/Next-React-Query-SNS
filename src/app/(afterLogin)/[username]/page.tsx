@@ -12,8 +12,17 @@ import { User } from '@/model/User';
 export async function generateMetadata({params}: Props) {
   const user: User = await getUserServer({ queryKey: ["users", params.username] });
   return {
+    openGraph: {
     title: `${user.nickname} (${user.id}) / Z`,
     description: `${user.nickname} (${user.id}) 프로필`,
+    images : [
+      {
+        url : `http://localhost:3000${user.image}`,
+        width : 400,
+        height : 400,
+      }
+    ]
+  }
   }
 }
 
@@ -28,6 +37,8 @@ export default async function Profile({params}: Props) {
   await queryClient.prefetchQuery({queryKey: ['posts', 'users', username], queryFn: getUserPosts})
   const dehydratedState = dehydrate(queryClient);
   const session = await auth();
+
+  
 
   return (
     <main className={style.main}>

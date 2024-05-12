@@ -1,22 +1,21 @@
-"use client";
-
-import { useRouter } from "next/navigation";
+import { redirect } from "next/navigation";
 import Main from "../_component/Main";
-import { useSession } from "next-auth/react";
+import { auth } from "@/auth";
+import RedirectToLogin from "./_component/RedirectToLogin";
 
 // 리다이렉트 되는곳
-const Login = () => {
-  const { data : session } = useSession();
-  const router = useRouter();
+const Login = async () => {
+  const session = await auth();
 
   if(session?.user){
-    router.replace('/home');
+    redirect('/home');
     return null;
   }
-  router.replace("/i/flow/login");
-  
+
   return (
     <>
+      {/* 컴포넌트가 마운트 되자마자 실행 */}
+      <RedirectToLogin/>
       <Main />
       {/** /login 에서 /i/flow/login으로 리다이렉트 가 되기에
        *  /login 배경을 메인페이지와 동일하게 만들어 주어야 한다.

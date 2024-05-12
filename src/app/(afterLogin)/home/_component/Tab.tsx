@@ -13,6 +13,7 @@ export default function Tab() {
     setTab('fol');
   }
 
+  // tab이 해당되는 것이 아니면 hidden으로 언더바css 제거 or 생성 해줌
   return (
     <div className={style.homeFixed}>
       <div className={style.homeText}>홈</div>

@@ -92,7 +92,7 @@ export default function PostForm({ me }: Props) {
               file,
             };
             return prev;
-          })
+          });
         };
         reader.readAsDataURL(file);
       });

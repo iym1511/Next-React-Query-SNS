@@ -8,6 +8,7 @@ export const getComments: QueryFunction<Post[], [_1: string, _2: string, _3: str
     next: {
       tags: ['posts', id, 'comments'],
     },
+    credentials : 'include',
     cache: 'no-store',
   });
   // The return value is *not* serialized
