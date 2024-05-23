@@ -6,56 +6,45 @@ import {useRouter} from "next/navigation";
 import 'dayjs/locale/ko';
 import style from '../message.module.css'
 import { faker } from "@faker-js/faker";
+import { Room as RoomType } from '@/model/Room';
+
 
 // 한글 플러그인
 dayjs.locale('ko');
 dayjs.extend(relativeTime)
 
-const Room = () => {
+type Props = {
+  room : RoomType,
+}
+
+const Room = ({room} : Props) => {
 
   const router = useRouter();
 
-  const user = {
-    id:'hero',
-    nickname: '영웅',
-    Messages: [
-      {
-        roomId: 123,
-        content:'안녕하세요',
-        createdAt: new Date()
-      },
-      {
-        roomId: 123,
-        content:'안녕히 가셈',
-        createdAt: new Date()
-      }
-    ]
-  }
-
   const onClick = () => {
-    router.push(`/messages/${user.Messages.at(-1)?.roomId}`);
+    router.push(`/messages/${room.room}`);
   }
 
 
   return (
     <div className={style.room} onClickCapture={onClick}>
       <div className={style.roomUserImage}>
-        <img src={faker.image.avatar()} alt="" />
+        <img src={room.Receiver.image} alt="" />
       </div>
       <div className={style.roomChatInfo}>
         <div className={style.roomUserInfo}>
-          <b>{user.nickname}</b>
+          <b>{room.Receiver.id}</b>
           &nbsp;
-          <span>@{user.id}</span>
+          <span>@{room.Receiver.id}</span>
           .
           &nbsp;
           <span className={style.postDate}>
             {/* at(-1) : 마지막 메시지 */}
-            {dayjs(user.Messages?.at(-1)?.createdAt).fromNow(true)}
+            {dayjs(room.createdAt).fromNow(true)}
           </span>
         </div>
         <div className={style.roomUserInfo}>
-          {user.Messages?.at(-1)?.content}
+          {room.content}
         </div>
       </div>
     </div>
