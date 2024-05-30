@@ -2,10 +2,12 @@
 import style from './messageForm.module.css';
 import TextareaAutosize from "react-textarea-autosize";
 import {ChangeEvent, FormEvent, useState} from "react";
+import useSocket from '../_lib/useSocket';
 
 const MessageForm = () => {
 
   const [content, setContent] = useState('');
+  const [socket] = useSocket();
 
   const onChangeContent = (e: ChangeEvent<HTMLTextAreaElement>) => {
     setContent(e.target.value);

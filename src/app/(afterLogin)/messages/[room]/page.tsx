@@ -1,7 +1,5 @@
 import { faker } from "@faker-js/faker";
 import style from "./chatRoom.module.css";
-import Link from "next/link";
-import BackButton from "@/app/(afterLogin)/_component/BackButton";
 import cx from 'classnames'
 import dayjs from 'dayjs';
 import 'dayjs/locale/ko';
@@ -11,6 +9,7 @@ import { auth } from "@/auth";
 import { getUserServer } from "../../[username]/_lib/getUserServer";
 import { QueryClient } from "@tanstack/react-query";
 import UserInfo from "./_component/UserInfo";
+import WebSocketComponent from "./_component/WebSocketComponent";
 
 
 // 한글 플러그인
@@ -59,6 +58,7 @@ const ChatRoom = async ({ params }: Props) => {
 
   return (
     <main className={style.main}>
+      <WebSocketComponent />
       <UserInfo id={ids[0]}/>
       <div className={style.list}>
         {messages.map((m, i) => {

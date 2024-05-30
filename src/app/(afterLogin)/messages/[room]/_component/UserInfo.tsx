@@ -1,21 +1,23 @@
-"use client"
+"use client";
 
 import { getUser } from "@/app/(afterLogin)/[username]/_lib/getUser";
 import BackButton from "@/app/(afterLogin)/_component/BackButton";
-import style from "@/app/(afterLogin)/messages/message.module.css"
-import { useQuery } from '@tanstack/react-query';
+import style from "@/app/(afterLogin)/messages/message.module.css";
+import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 
 interface Props {
-  id : string
+  id: string;
 }
 
 const UserInfo = ({ id }: Props) => {
-
-  const {data: user} = useQuery({ queryKey: ['users', id], queryFn: getUser});
+  const { data: user } = useQuery({
+    queryKey: ["users", id],
+    queryFn: getUser,
+  });
 
   // 유저 채팅 데이터가 없는 경우 null 처리
-  if(!user){
+  if (!user) {
     return null;
   }
 
