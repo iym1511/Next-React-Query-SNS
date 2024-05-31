@@ -79,7 +79,7 @@ const ChatRoom = async ({ params }: Props) => {
           }
         })}
       </div>
-      <MessageForm />
+      <MessageForm id={ids[0]}/>
     </main>
   );
 };

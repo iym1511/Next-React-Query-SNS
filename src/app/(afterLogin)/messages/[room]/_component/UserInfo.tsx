@@ -2,7 +2,7 @@
 
 import { getUser } from "@/app/(afterLogin)/[username]/_lib/getUser";
 import BackButton from "@/app/(afterLogin)/_component/BackButton";
-import style from "@/app/(afterLogin)/messages/message.module.css";
+import style from "@/app/(afterLogin)/messages/[room]/chatRoom.module.css";
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 

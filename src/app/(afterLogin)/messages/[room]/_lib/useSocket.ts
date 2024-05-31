@@ -1,9 +1,11 @@
 import { Socket, io } from "socket.io-client";
 import { useCallback, useEffect, useState } from "react";
+import { useSession } from "next-auth/react";
 
 let socket: Socket | null;
 
-const useSocket = () => {
+const useSocket = (): [Socket | null, () => void] => {
+  const {data: session} = useSession();
 
   // 웹 소켓 연결을 종료하는 함수
   const disconnect = useCallback(()=> {
@@ -18,6 +20,7 @@ const useSocket = () => {
       const socketResult = io(`${process.env.NEXT_PUBLIC_BASE_URL}/messages`, {
         transports: ['websocket'] // 대충 구형 신경안쓰고 신형 브라우저 고려함
       })
+
       // 에러 처리
       socketResult.on('connect_error',(err)=>{
         console.error(err);
@@ -25,7 +28,14 @@ const useSocket = () => {
       })
       socket = socketResult;
     }
-  },[])
+  },[session])
+
+  // 연결 맺는 순간에는 id가 인식이 안되 없는걸로 되서 다른 useEffect로 분리
+  useEffect(() => {
+    if(socket?.connected && session?.user?.email) {
+      socket?.emit('login', { id : session?.user?.email });
+    }
+  })
 
   return [socket, disconnect];
 }
