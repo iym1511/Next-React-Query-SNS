@@ -8,7 +8,8 @@ import getMessages from "../_lib/getMessages";
 import { useSession } from "next-auth/react";
 import { Message } from "@/model/Message";
 import { useInView } from "react-intersection-observer";
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useMessageStore } from "@/store/message";
 
 interface Props {
   id : string
@@ -17,6 +18,11 @@ interface Props {
 const MessageList = ({id}:Props) => {
 
   const { data : session } = useSession();
+  const listRef = useRef<HTMLDivElement>(null);
+  const [pageRendered, setPageRendered] = useState(false);
+  const shouldGoDown = useMessageStore().shouldGoDown;
+  const setGoDown = useMessageStore().setGoDown;
+
   const { data: messages, isFetching, hasPreviousPage, fetchPreviousPage } = useInfiniteQuery<Message[], DefaultError, InfiniteData<Message[]>, [string, {
     senderId: string,
     receiverId: string,
@@ -42,10 +48,30 @@ const MessageList = ({id}:Props) => {
     }
   },[inView, isFetching, hasPreviousPage, fetchPreviousPage])
 
+  let hasMessages = !!messages;
+  useEffect(()=> {
+    if(hasMessages) {
+      console.log(listRef.current);
+      if(listRef.current){
+        listRef.current.scrollTop = listRef.current.scrollHeight;
+      }
+      setPageRendered(true);
+    }
+  },[hasMessages])
+
+  useEffect(() => {
+    if(shouldGoDown) {
+      if(listRef.current){
+        listRef.current.scrollTop = listRef.current.scrollHeight;
+        setGoDown(false);
+      }
+    }
+  },[shouldGoDown])
+
   return ( 
-    <div className={style.list}>
+    <div className={style.list} ref={listRef}>
       {/* 인피니트 스크롤 */}
-    <div ref={ref} style={{ height: 50}} /> 
+    { pageRendered && <div ref={ref} style={{ height: 50, backgroundColor: "yellow"}} /> }
     {messages?.pages.map((page) => page.map((m) => {
         if (m.senderId === session?.user?.email) { // 내 메시지 면
           return (

@@ -5,8 +5,8 @@ import relativeTime from 'dayjs/plugin/relativeTime';
 import {useRouter} from "next/navigation";
 import 'dayjs/locale/ko';
 import style from '../message.module.css'
-import { faker } from "@faker-js/faker";
 import { Room as RoomType } from '@/model/Room';
+import { useSession } from 'next-auth/react';
 
 
 // 한글 플러그인
@@ -19,23 +19,26 @@ type Props = {
 
 const Room = ({room} : Props) => {
 
+  const { data : session} = useSession();
   const router = useRouter();
 
   const onClick = () => {
     router.push(`/messages/${room.room}`);
   }
 
+  const user = room.Receiver.id === session?.user?.email ? room.Sender : room.Receiver;
 
   return (
     <div className={style.room} onClickCapture={onClick}>
       <div className={style.roomUserImage}>
-        <img src={room.Receiver.image} alt="" />
+        <img src={user.image} alt="" />
       </div>
       <div className={style.roomChatInfo}>
         <div className={style.roomUserInfo}>
-          <b>{room.Receiver.id}</b>
+          <b>{user.nickname}</b>
           &nbsp;
-          <span>@{room.Receiver.id}</span>
+          <span>@{user.id}</span>
+          &nbsp;
           .
           &nbsp;
           <span className={style.postDate}>

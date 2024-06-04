@@ -6,14 +6,15 @@ import useSocket from '../_lib/useSocket';
 import { useSession } from 'next-auth/react';
 import { InfiniteData, useQueryClient } from '@tanstack/react-query';
 import { Message } from '@/model/Message';
+import { useMessageStore } from '@/store/message';
 
 interface Props {
   id : string
 }
 
 const MessageForm = ({ id }:Props) => {
-
   const [content, setContent] = useState('');
+  const setGoDown = useMessageStore().setGoDown;
   // 이것만 추가하면 소켓 연결이 됨
   const [socket] = useSocket();
   const { data: session } = useSession();
@@ -48,7 +49,6 @@ const MessageForm = ({ id }:Props) => {
           ...exMessages.pages
         ],
       };
-
       const lastPage = newMessages.pages.at(-1); // 배열 마지막 부분(채팅배열이 위치한 곳)
       const newLastPage = lastPage ? [...lastPage] : []; 
       let lastMessageId = lastPage?.at(-1)?.messageId; // 채팅배열 마지막부분 id
@@ -62,6 +62,7 @@ const MessageForm = ({ id }:Props) => {
       });
       newMessages.pages[newMessages.pages.length - 1] = newLastPage; // 채팅배열쪽에 추가
       queryClient.setQueryData(['rooms', {senderId: session?.user?.email, receiverId: id} ,'messages'], newMessages); // 채팅 저장
+      setGoDown(true);
     }
     setContent('');
   }
