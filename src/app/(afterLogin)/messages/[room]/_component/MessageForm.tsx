@@ -71,16 +71,6 @@ const MessageForm = ({ id }:Props) => {
  
   }
 
-  // 서버로 부터 데이터를 실시간으로 받아올 수 있다.
-  // socket을 사용할땐 항상 off로 꺼줘야 한다 그렇지 않으면 이벤트 리스너가 계속 연결되기 때문
-  useEffect(()=> {
-    socket?.on('receiveMessage', (data) => {
-      console.log('data : ',data);
-    });
-    return () => {
-      socket?.off('receiveMessage');
-    }
-  },[socket])
 
   return ( 
     <div className={style.formZone}>
