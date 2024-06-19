@@ -15,7 +15,7 @@ const UserInfo = ({ id }: Props) => {
     queryKey: ["users", id],
     queryFn: getUser,
   });
-
+  
   // 유저 채팅 데이터가 없는 경우 null 처리
   if (!user) {
     return null;

@@ -19,6 +19,9 @@ const Main = () => {
         <Link href="/login" className={styles.login}>
           로그인
         </Link>
+        <Link href="/x/tst/qwe" className={styles.login}>
+          테스트 버튼
+        </Link>
       </div>
     </>
   );

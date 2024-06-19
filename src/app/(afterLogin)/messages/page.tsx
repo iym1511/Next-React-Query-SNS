@@ -14,7 +14,7 @@ const Home = async () => {
   const session = await auth();
   // 데이터를 배열로 반환해주어야 하기 때문에 false일때도 배열로 지정
   const rooms = session?.user?.email ? await getRooms(session?.user?.email) : [];
-
+  console.log("rooms 데이터 : ", rooms);
   return (
     <main className={style.main}>
       <div className={style.header}>

@@ -13,6 +13,7 @@ type Props = {
 }
 export default function FollowRecommend({ user }: Props) {
   const { data: session } = useSession();
+  console.log("FollowRecommend 데이터 테스트 : ",user);
   const followed = !!user.Followers?.find((v) => v.id === session?.user?.email);
   const queryClient = useQueryClient();
   const follow = useMutation({

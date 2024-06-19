@@ -5,11 +5,7 @@ import axios from 'axios'
 import { cookies } from "next/headers";
 import cookie from "cookie";
 
-export const {
-  handlers: { GET, POST },
-  auth,
-  signIn,
-} = NextAuth({
+export const { handlers: { GET, POST }, auth, signIn} = NextAuth({
   pages: {
     signIn: '/i/flow/login',
     newUser: '/i/flow/signup',

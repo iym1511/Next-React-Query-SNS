@@ -19,6 +19,7 @@ const TrendSection = () => {
     enabled : !!session?.user
   });
 
+
   const pathname = usePathname();
   console.log(session);
 

@@ -25,9 +25,10 @@ const Room = ({room} : Props) => {
   const onClick = () => {
     router.push(`/messages/${room.room}`);
   }
+  
 
   const user = room.Receiver.id === session?.user?.email ? room.Sender : room.Receiver;
-
+  
   return (
     <div className={style.room} onClickCapture={onClick}>
       <div className={style.roomUserImage}>

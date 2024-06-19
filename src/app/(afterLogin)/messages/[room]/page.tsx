@@ -26,7 +26,7 @@ const ChatRoom = async ({ params }: Props) => {
   const session = await auth();
   const queryClient = new QueryClient();
   const ids = params.room.split('-').filter((v) => v !== session?.user?.email);
-  if(!ids[0]){
+  if(!ids[0]){ 
     return null;
   }
   
