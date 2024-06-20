@@ -15,7 +15,7 @@ type Props = {
   session: Session | null;
 }
 export default function UserInfo({username, session }: Props) {
-
+  
   const router = useRouter();
   const {data: user, error} = useQuery<User, Object, User, [_1: string, _2: string]>({
     queryKey: ['users', username],

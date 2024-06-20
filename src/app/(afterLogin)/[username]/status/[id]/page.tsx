@@ -38,7 +38,7 @@ type Props = {
 }
 
 export default async function Page({ params }: Props) {
-
+  
   const {id} = params;
   const queryClient = new QueryClient();
   await queryClient.prefetchQuery({queryKey: ['posts', id], queryFn: getSinglePostServer})

@@ -1,4 +1,3 @@
-
 import style from './profile.module.css';
 import {dehydrate, HydrationBoundary, QueryClient} from "@tanstack/react-query";
 import UserPosts from "@/app/(afterLogin)/[username]/_component/UserPosts";
@@ -27,7 +26,7 @@ export async function generateMetadata({params}: Props) {
 }
 
 type Props = {
-  params: { id:string, username: string },
+  params: { username: string },
 }
 
 export default async function Profile({params}: Props) {

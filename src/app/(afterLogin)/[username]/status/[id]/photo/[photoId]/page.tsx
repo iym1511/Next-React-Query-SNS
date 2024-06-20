@@ -2,6 +2,7 @@
 // photo 클릭 시 상세페이지 @modal 배경담당
 
 import Home from "@/app/(afterLogin)/home/page";
+// import PhotoPage from "@/app/(afterLogin)/[username]/status/[id]/page";
 
 type Props = {
   params: {
