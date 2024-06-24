@@ -5,6 +5,7 @@ import style from "./signup.module.css";
 import onSubmit from "../_lib/signup";
 import { useFormState, useFormStatus } from "react-dom";
 
+// 반환된 에러메시지에 따라 한글메시지로 변환
 /* 글로벌 서비스를 할때 언어별 오류메시지 */
 const showMessage = (message?: string | null) => {
   if (message === "no_id") {
@@ -27,11 +28,11 @@ const showMessage = (message?: string | null) => {
 
 export default function SignupModal() {
   // [state(함수에서 return되는 값), formAction(사용할 함수)]  =  (폼 스테이트에서 관리하는 함수, 반환값 기본형태)
-  const [state, formAction] = useFormState(onSubmit, { message: null });
+  const [ state, formAction ] = useFormState(onSubmit, {message : null});
   // 처리중일때 가입버튼 활성x
-  const { pending } = useFormStatus();
-  console.log(pending);
-  console.log(state?.message);
+  const { pending, data, method, action } = useFormStatus();
+  console.log("팬딩 : ", pending);
+  console.log(state?.message); // 반환된 에러 메시지
   console.log(state);
 
   return (
@@ -54,7 +55,7 @@ export default function SignupModal() {
                   className={style.input}
                   type="text"
                   placeholder=""
-                  required
+                  // required
                 />
               </div>
               <div className={style.inputDiv}>
@@ -67,7 +68,7 @@ export default function SignupModal() {
                   className={style.input}
                   type="text"
                   placeholder=""
-                  required
+                  // required
                 />
               </div>
               <div className={style.inputDiv}>
@@ -80,7 +81,7 @@ export default function SignupModal() {
                   className={style.input}
                   type="password"
                   placeholder=""
-                  required
+                  // required
                 />
               </div>
               <div className={style.inputDiv}>
@@ -90,10 +91,10 @@ export default function SignupModal() {
                 <input
                   id="image"
                   name="image"
-                  required
                   className={style.input}
                   type="file"
                   accept="image/*"
+                  // required
                 />
               </div>
             </div>

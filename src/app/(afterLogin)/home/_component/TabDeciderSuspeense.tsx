@@ -17,7 +17,7 @@ const TabDeciderSuspense = async () => {
 
   return (
     <HydrationBoundary state={dehydratedState}>
-      <TabDecider />
+      <TabDecider/>
     </HydrationBoundary>
   );
 };

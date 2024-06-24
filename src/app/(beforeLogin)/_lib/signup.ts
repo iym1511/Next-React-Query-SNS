@@ -2,11 +2,12 @@
 
 import { signIn } from "@/auth";
 import { redirect } from "next/navigation";
-// import axios from "axios";
 
-export default async (prevState: any,formData: FormData) => {
+// 두개의 인자를 가진다. 
+export default async (prevState: {message : string | null}, formData: FormData) => {
   // 입력값이 없거나 || 빈칸이 존재하지않을때
   if (!formData.get("id") || !(formData.get("id") as string)?.trim()) {
+    console.log(prevState);
     return { message: "no_id" };
   }
   if (!formData.get("name") || !(formData.get("name") as string)?.trim()) {

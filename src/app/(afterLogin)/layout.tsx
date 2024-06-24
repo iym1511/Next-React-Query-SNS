@@ -16,7 +16,7 @@ type Props = { children: ReactNode; modal: ReactNode };
 // home의 레이아웃
 export default async function AfterLoginLayout({ children, modal }: Props) {
   const session = await auth();
-
+  
   return (
     <div className={style.container}>
       <RQProvider>
@@ -58,6 +58,7 @@ export default async function AfterLoginLayout({ children, modal }: Props) {
 
         <div className={style.rightSectionWrapper}>
           <div className={style.rightSectionInner}>
+            {/* (afterLogin) Layout.tsx 하위 요소들이 여기 전부 들어감*/}
             <main className={style.main}>{children}</main>
             <section className={style.rightSection}>
               <RightSearchZone />
